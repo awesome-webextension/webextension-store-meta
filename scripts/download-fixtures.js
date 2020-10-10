@@ -62,10 +62,7 @@ async function main() {
 
         try {
           const html = await fetchText(ext.url)
-          await fs.outputFile(
-            path.join(fixtureDir, encodeURIComponent(ext.url)),
-            html
-          )
+          await fs.outputFile(path.join(fixtureDir, ext.id), html)
           bars.update(serviceName, ext.id, 'success')
         } catch (error) {
           bars.update(serviceName, ext.id, 'failed')
