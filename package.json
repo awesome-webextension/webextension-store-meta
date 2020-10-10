@@ -1,0 +1,62 @@
+{
+  "name": "webextension-store-meta",
+  "version": "0.1.0",
+  "description": "Get browser extension(webextension) item meta from Chrome Web Store, Microsoft Edge Store and Firefox add-ons.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "lint": "eslint index.js services/** lib/**",
+    "fixtures": "node scripts/download-fixtures"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crimx/webextension-store-meta.git"
+  },
+  "keywords": [
+    "chrome",
+    "firefox",
+    "amo",
+    "edge",
+    "extension",
+    "webextension",
+    "addon",
+    "add-on",
+    "web-store",
+    "webstore",
+    "chrome-app",
+    "chrome-extension",
+    "chrome-theme",
+    "chrome-web-store",
+    "microsoftedge",
+    "microsoft-edge",
+    "firefox-addons",
+    "itemprop",
+    "meta"
+  ],
+  "author": "CRIMX <straybugs@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/crimx/webextension-store-meta/issues"
+  },
+  "homepage": "https://github.com/crimx/webextension-store-meta#readme",
+  "engines": {
+    "node": ">=10.3.0"
+  },
+  "devDependencies": {
+    "cli-progress": "^3.8.2",
+    "colors": "^1.4.0",
+    "eslint": "^7.10.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "fs-extra": "^9.0.1",
+    "https-proxy-agent": "^5.0.0",
+    "prettier": "2.1.2",
+    "yargs": "^16.0.3"
+  },
+  "dependencies": {
+    "jsdom": "^16.4.0",
+    "node-fetch": "^2.6.1",
+    "user-agents": "^1.0.559"
+  }
+}
