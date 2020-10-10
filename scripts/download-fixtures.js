@@ -17,7 +17,7 @@ const maxFixtures = typeof argv.max === 'number' ? argv.max : 5
 main()
 
 async function main() {
-  const fixturesDir = path.join(__dirname, '..', 'test', '.fixtures')
+  const fixturesDir = path.join(__dirname, '..', '.fixtures')
   await fs.emptyDir(fixturesDir)
 
   const servicesDir = path.join(__dirname, '..', 'services')

@@ -105,4 +105,4 @@ dist
 
 .vscode
 
-test/.fixtures
+.fixtures
