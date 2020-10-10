@@ -1,7 +1,7 @@
 const fs = require('fs-extra')
 const path = require('path')
 const fetchText = require('../lib/fetch-text')
-const ProgressBars = require('../lib/progress-bars')
+const ProgressBars = require('./progress-bars')
 const { argv } = require('yargs')
 
 const maxFixtures = typeof argv.max === 'number' ? argv.max : 5
