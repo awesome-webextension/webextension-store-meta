@@ -22,8 +22,19 @@ async function main() {
     await fs.emptyDir(fixturesDir)
   }
 
-  const servicesDir = path.join(__dirname, '..', 'services')
-  const serviceNames = await fs.readdir(servicesDir)
+  const servicesDir = path.join(__dirname, '..', 'lib')
+  const serviceNames = (
+    await Promise.all(
+      (await fs.readdir(servicesDir)).map(async (name) => {
+        try {
+          const stats = await fs.stat(path.join(servicesDir, name))
+          return stats.isDirectory() ? name : null
+        } catch (e) {
+          return null
+        }
+      })
+    )
+  ).filter(Boolean)
 
   const failedFixtures = []
   const bars = new ProgressBars()

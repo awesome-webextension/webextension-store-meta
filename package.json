@@ -1,14 +1,14 @@
 {
   "name": "webextension-store-meta",
   "version": "0.1.0",
-  "description": "Get browser extension(webextension) item meta from Chrome Web Store, Microsoft Edge Store and Firefox add-ons.",
+  "description": "Get browser extension(webextension) item meta from Chrome Web Store and Firefox add-ons.",
   "main": "index.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
     "test": "jest",
-    "lint": "eslint *.js {lib,scripts,services}/**/*.js",
+    "lint": "eslint *.js {lib,scripts}/**/*.js",
     "fixtures": "node scripts/download-fixtures"
   },
   "repository": {
@@ -19,7 +19,6 @@
     "chrome",
     "firefox",
     "amo",
-    "edge",
     "extension",
     "webextension",
     "addon",
@@ -30,8 +29,6 @@
     "chrome-extension",
     "chrome-theme",
     "chrome-web-store",
-    "microsoftedge",
-    "microsoft-edge",
     "firefox-addons",
     "itemprop",
     "meta"
