@@ -1,3 +1,4 @@
 module.exports = {
-  amo: require('./services/amo'),
+  Amo: require('./services/amo'),
+  ChromeWebStore: require('./services/chrome-web-store'),
 }

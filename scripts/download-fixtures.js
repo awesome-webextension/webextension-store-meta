@@ -18,7 +18,9 @@ main()
 
 async function main() {
   const fixturesDir = path.join(__dirname, '..', '.fixtures')
-  await fs.emptyDir(fixturesDir)
+  if (argv.force) {
+    await fs.emptyDir(fixturesDir)
+  }
 
   const servicesDir = path.join(__dirname, '..', 'services')
   const serviceNames = await fs.readdir(servicesDir)
