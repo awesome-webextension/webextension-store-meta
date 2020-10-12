@@ -1,6 +1,8 @@
 const querystring = require('querystring')
 const { JSDOM } = require('jsdom')
 const fetchText = require('../../lib/fetch-text')
+const parseVersion = require('../../lib/parse-version')
+const parseNum = require('../../lib/parse-num')
 
 /**
  * @typedef {Object} ChromeWebStoreOptions
@@ -51,16 +53,17 @@ module.exports = class ChromeWebStore {
 
   meta() {
     return {
-      browser: 'chrome',
       name: this.name(),
       description: this.description(),
-      rating: this.rating(),
+      ratingValue: this.ratingValue(),
+      ratingCount: this.ratingCount(),
       users: this.users(),
       price: this.price(),
       priceCurrency: this.priceCurrency(),
       version: this.version(),
       url: this.url(),
       image: this.image(),
+      operatingSystem: this.operatingSystem(),
     }
   }
 
@@ -94,25 +97,34 @@ module.exports = class ChromeWebStore {
   }
 
   /** @returns {number|null} */
-  rating() {
+  ratingValue() {
+    let ratingValue = parseNum(this._extractItemprop('ratingValue'))
+    if (ratingValue >= 0 && ratingValue <= 5) return ratingValue
+
     const rswStars = this.document.querySelector('.rsw-stars')
     if (rswStars) {
-      const stars = parseFloat(
-        (rswStars.getAttribute('title') || '').replace(/^[^\d.]*/, '')
-      )
-      if (stars >= 0 && stars <= 5) {
-        return stars
-      }
+      ratingValue = parseNum(rswStars.getAttribute('title'))
+      if (ratingValue >= 0 && ratingValue <= 5) return ratingValue
     }
 
     const bhAbjd = this.document.querySelector('.bhAbjd')
     if (bhAbjd) {
-      const stars = parseFloat(
-        (bhAbjd.getAttribute('aria-label') || '').replace(/^[^\d.]*/, '')
-      )
-      if (stars >= 0 && stars <= 5) {
-        return stars
-      }
+      ratingValue = parseNum(bhAbjd.getAttribute('aria-label'))
+      if (ratingValue >= 0 && ratingValue <= 5) return ratingValue
+    }
+
+    return null
+  }
+
+  /** @returns {number|null} */
+  ratingCount() {
+    let ratingCount = parseNum(this._extractItemprop('ratingCount'))
+    if (ratingCount >= 0) return ratingCount
+
+    const bhAbjd = this.document.querySelector('.bhAbjd')
+    if (bhAbjd) {
+      ratingCount = parseNum(bhAbjd.textContent)
+      if (ratingCount >= 0) return ratingCount
     }
 
     return null
@@ -120,34 +132,22 @@ module.exports = class ChromeWebStore {
 
   /** @returns {number|null} */
   users() {
-    let interactionCount = this._extractItemprop('interactionCount')
-    if (interactionCount) {
-      const usersMatch = /[\d,.]+/.exec(interactionCount)
-      if (usersMatch) {
-        const value = parseFloat(usersMatch[0].replace(',', ''))
-        if (value >= 0) {
-          return value
-        }
-      }
-    }
+    let users = parseNum(this._extractItemprop('interactionCount'))
+    if (users >= 0) return users
 
     const contentUsers = this.document.querySelector('.e-f-ih')
     if (contentUsers) {
-      const usersMatch = /[\d,.]+/.exec(
-        contentUsers.getAttribute('title') || ''
-      )
-      if (usersMatch) {
-        const value = parseFloat(usersMatch[0].replace(',', ''))
-        if (value >= 0) {
-          return value
-        }
-      }
+      users = parseNum(contentUsers.getAttribute('title'))
+      if (users >= 0) return users
     }
+
+    return null
   }
 
   /** @returns {string|null} */
   price() {
-    return this._extractItemprop('price')
+    const price = parseNum(this._extractItemprop('price'))
+    return price >= 0 ? price : null
   }
 
   /** @returns {string|null} */
@@ -162,10 +162,8 @@ module.exports = class ChromeWebStore {
 
     const contentVersion = this.document.querySelector('.h-C-b-p-D-md')
     if (contentVersion) {
-      version = (contentVersion.textContent || '').trim()
-      if (/^\d+\.\d+\.\d+$/.test(version)) {
-        return version
-      }
+      version = parseVersion(contentVersion.textContent)
+      if (version) return version
     }
 
     return null
@@ -197,6 +195,11 @@ module.exports = class ChromeWebStore {
       )
     }
     return this._document
+  }
+
+  /** @returns {string|null} */
+  operatingSystem() {
+    return this._extractItemprop('operatingSystem')
   }
 
   _extractItemprop(itemprop) {

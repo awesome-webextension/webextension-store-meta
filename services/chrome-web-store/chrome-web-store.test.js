@@ -25,19 +25,20 @@ describe('Chrome Web Store', () => {
   })
 
   const matchAnyInfo = {
-    browser: 'chrome',
     name: expect.any(String),
     description: expect.any(String),
-    rating: expect.any(Number),
+    ratingValue: expect.any(Number),
+    ratingCount: expect.any(Number),
     users: expect.any(Number),
-    price: expect.any(String),
+    price: expect.any(Number),
     priceCurrency: expect.any(String),
     version: expect.any(String),
     url: expect.any(String),
     image: expect.any(String),
+    operatingSystem: expect.any(String),
   }
 
-  describe.each([extIds[0]])(
+  describe.each(extIds)(
     '%s',
     (extId) => {
       it('should return ext info', async () => {
