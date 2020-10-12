@@ -1,4 +1,9 @@
 # webextension-store-meta
+
+[![npm-version](https://img.shields.io/npm/v/webextension-store-meta.svg)](https://www.npmjs.com/package/webextension-store-meta)
+[![Build Status](https://img.shields.io/travis/com/crimx/webextension-store-meta/master)](https://travis-ci.com/crimx/webextension-store-meta)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+
 Get browser extension(webextension) item meta from Chrome Web Store and Firefox add-ons.
 
 This lib uses many fallback methods to improve stability.
