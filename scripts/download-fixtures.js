@@ -2,9 +2,12 @@ const fs = require('fs-extra')
 const path = require('path')
 const fetchText = require('../lib/fetch-text')
 const ProgressBars = require('./progress-bars')
+const HttpsProxyAgent = require('https-proxy-agent')
 const { argv } = require('yargs')
 
 const maxFixtures = typeof argv.max === 'number' ? argv.max : 5
+const proxyAgent =
+  typeof argv.proxy === 'string' ? new HttpsProxyAgent(argv.proxy) : undefined
 
 /**
  * cli options:
@@ -62,7 +65,7 @@ async function main() {
 
       let exts
       try {
-        exts = await downloadFixtures({ maxFixtures })
+        exts = await downloadFixtures({ maxFixtures, proxyAgent })
       } catch (error) {
         console.error(error)
         return
@@ -74,7 +77,7 @@ async function main() {
         bars.create(serviceName, ext.id)
 
         try {
-          const html = await fetchText(ext.url)
+          const html = await fetchText(ext.url, { agent: proxyAgent })
           await fs.outputFile(path.join(fixtureDir, ext.id), html)
           bars.update(serviceName, ext.id, 'success')
         } catch (error) {
