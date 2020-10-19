@@ -6,14 +6,45 @@
 
 Get browser extension(webextension) item meta from Chrome Web Store and Firefox add-ons.
 
-This lib uses many fallback methods to improve stability.
+This lib uses many fallback methods to improve stability and performance.
+
+## Who Use It
+
+<table>
+  <tbody>
+    <tr>
+      <td align="center">
+        <img width="198" height="58" src="https://raw.githubusercontent.com/badges/shields/master/frontend/images/logo.svg?sanitize=true">
+    </td>
+      <td align="center">
+        <img width="80" height="80" src="https://badgen.net/static/badgen-logo.svg">
+      </td>
+    </tr>
+    <tr>
+      <th align="center">
+        <a href="https://shields.io/">Shields.io</a>
+      </th>
+      <th align="center">
+        <a href="https://badgen.net/chrome-web-store">Badgen</a>
+      </th>
+    </tr>
+    <tr>
+      <td align="center">
+        Quality metadata badges <br>for open source projects
+      </td>
+      <td align="center">
+        Fast badge generating service
+      </td>
+    </tr>
+  <tbody>
+</table>
 
 ## Installation
 
 npm
 
 ```bash
-npm install webextension-store-meta
+npm add webextension-store-meta
 ```
 
 yarn
