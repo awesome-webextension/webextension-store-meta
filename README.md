@@ -2,6 +2,7 @@
 
 [![npm-version](https://img.shields.io/npm/v/webextension-store-meta.svg)](https://www.npmjs.com/package/webextension-store-meta)
 [![Build Status](https://img.shields.io/travis/com/crimx/webextension-store-meta/master)](https://travis-ci.com/crimx/webextension-store-meta)
+[![Coverage Status](https://img.shields.io/coveralls/github/crimx/webextension-store-meta/master)](https://coveralls.io/github/crimx/webextension-store-meta?branch=master)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 Get browser extension(webextension) item meta from Chrome Web Store and Firefox add-ons.
