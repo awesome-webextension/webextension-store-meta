@@ -58,7 +58,8 @@
     "yargs": "^16.0.3"
   },
   "dependencies": {
-    "htmlparser2": "^5.0.0",
+    "domutils": "^2.7.0",
+    "htmlparser2": "^6.1.0",
     "node-fetch": "^2.6.1"
   }
 }
