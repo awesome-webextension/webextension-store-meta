@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/crimx/webextension-store-meta.git"
+    "url": "git+https://github.com/awesome-webextension/webextension-store-meta.git"
   },
   "keywords": [
     "chrome",
@@ -37,9 +37,9 @@
   "author": "CRIMX <straybugs@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/crimx/webextension-store-meta/issues"
+    "url": "https://github.com/awesome-webextension/webextension-store-meta/issues"
   },
-  "homepage": "https://github.com/crimx/webextension-store-meta#readme",
+  "homepage": "https://github.com/awesome-webextension/webextension-store-meta#readme",
   "engines": {
     "node": ">=10.3.0"
   },
