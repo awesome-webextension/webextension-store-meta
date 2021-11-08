@@ -4,8 +4,8 @@
 # webextension-store-meta
 
 [![npm-version](https://img.shields.io/npm/v/webextension-store-meta.svg)](https://www.npmjs.com/package/webextension-store-meta)
-[![Build Status](https://img.shields.io/travis/com/crimx/webextension-store-meta/master)](https://travis-ci.com/crimx/webextension-store-meta)
-[![Coverage Status](https://img.shields.io/coveralls/github/crimx/webextension-store-meta/master)](https://coveralls.io/github/crimx/webextension-store-meta?branch=master)
+[![Build Status](https://github.com/awesome-webextension/webextension-store-meta/actions/workflows/build.yml/badge.svg)](https://github.com/awesome-webextension/webextension-store-meta/actions/workflows/build.yml)
+[![Coverage Status](https://img.shields.io/coveralls/github/awesome-webextension/webextension-store-meta/master)](https://coveralls.io/github/awesome-webextension/webextension-store-meta?branch=master)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 </div>
