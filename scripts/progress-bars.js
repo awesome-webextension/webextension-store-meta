@@ -10,6 +10,7 @@ module.exports = class ProgressBars {
     this.failed = 0
 
     this.multibar = new cliProgress.MultiBar({
+      noTTYOutput: true,
       emptyOnZero: true,
       hideCursor: true,
       clearOnComplete: !argv.keep,
