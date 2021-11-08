@@ -1,3 +1,7 @@
+## [1.0.5] - 2021-11-08
+### Updated
+- Replace Travis-CI with Github Actions.
+
 ## [1.0.4] - 2021-06-12
 ### Fixed
 - Fix [#1](https://github.com/crimx/webextension-store-meta/issues/1) by adding domutils to dependencies.
