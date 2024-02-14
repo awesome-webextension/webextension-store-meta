@@ -109,13 +109,13 @@ Load config:
 ```bash
 git clone git@github.com:crimx/webextension-store-meta.git
 cd webextension-store-meta
-yarn install
+pnpm i
 
 # {--max 5} - max 5 fixtures for each service
 # {--proxy http://xxx:xxx} - http proxy
 # {--force} - always download fixtures, otherwise skip if fixtures dir not empty
 # {--keep} - keep progress result
-yarn fixtures --keep
+pnpm fixtures --keep
 
-yarn test --watch
+pnpm test --watch
 ```
