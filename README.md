@@ -10,8 +10,6 @@
 
 </div>
 
-
-
 Get browser extension(webextension) item meta from Chrome Web Store and Firefox add-ons.
 
 This lib uses many fallback methods to improve stability and performance.
@@ -22,10 +20,10 @@ This lib uses many fallback methods to improve stability and performance.
   <tbody>
     <tr>
       <td align="center">
-        <img width="198" height="58" src="https://raw.githubusercontent.com/badges/shields/master/frontend/images/logo.svg?sanitize=true">
+        <img width="198" height="58" src="https://raw.githubusercontent.com/badges/shields/master/readme-logo.svg?sanitize=true">
     </td>
       <td align="center">
-        <img width="80" height="80" src="https://badgen.net/static/badgen-logo.svg">
+        <img width="80" height="80" src="https://badgen.net/statics/badgen-logo.svg">
       </td>
     </tr>
     <tr>
@@ -67,7 +65,10 @@ All stores share the same api.
 
 ```js
 const ChromeWebStore = require('webextension-store-meta/lib/chrome-web-store')
-const chromeWebStore = await ChromeWebStore.load({ id: 'xxxxxxx', qs: { hl: 'en' } })
+const chromeWebStore = await ChromeWebStore.load({
+  id: 'xxxxxxx',
+  qs: { hl: 'en' },
+})
 console.log(chromeWebStore.meta())
 
 const Amo = require('webextension-store-meta/lib/amo')
@@ -100,9 +101,9 @@ console.log(amo.ratingValue())
 
 Load config:
 
-- **id** `{string}` *required* - extension id.
-- **qs** `{string|object}` *optional* - querystring.
-- **options** `object` *optional* - [node-fetch options](https://www.npmjs.com/package/node-fetch#options).
+- **id** `{string}` _required_ - extension id.
+- **qs** `{string|object}` _optional_ - querystring.
+- **options** `object` _optional_ - [node-fetch options](https://www.npmjs.com/package/node-fetch#options).
 
 ## Development
 
