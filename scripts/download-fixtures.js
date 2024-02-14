@@ -35,7 +35,7 @@ async function main() {
         } catch (e) {
           return null
         }
-      })
+      }),
     )
   ).filter(Boolean)
 
@@ -57,11 +57,9 @@ async function main() {
         }
       }
 
-      const downloadFixtures = require(path.join(
-        servicesDir,
-        serviceName,
-        'fixtures'
-      ))
+      const downloadFixtures = require(
+        path.join(servicesDir, serviceName, 'fixtures'),
+      )
 
       let exts
       try {
@@ -85,7 +83,7 @@ async function main() {
           failedFixtures.push(`${serviceName}/${ext.id}`)
         }
       }
-    })
+    }),
   )
 
   bars.stop()

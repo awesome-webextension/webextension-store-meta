@@ -25,7 +25,7 @@ module.exports = class ProgressBars {
             `Total [${bar}] ${percentage}% | ` +
               `${colors.green(this.success)}/${colors.red(this.failed)}/${
                 this.total
-              }`
+              }`,
           )
         }
 
@@ -47,7 +47,7 @@ module.exports = class ProgressBars {
     if (!this.serviceBars.has(name)) {
       this.serviceBars.set(
         name,
-        this.multibar.create(100, 0, { service, ext, status: 'downloading' })
+        this.multibar.create(100, 0, { service, ext, status: 'downloading' }),
       )
     }
   }
