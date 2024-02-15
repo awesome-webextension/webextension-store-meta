@@ -1,3 +1,7 @@
+## [1.1.0] - 2023-02-16
+### Updated
+- Update to the new Chrome Web Store. Removed `operatingSystem`, `price` and `priceCurrency`.
+
 ## [1.0.5] - 2021-11-08
 ### Updated
 - Replace Travis-CI with Github Actions.
