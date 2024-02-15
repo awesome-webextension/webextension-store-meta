@@ -58,7 +58,7 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "domutils": "^2.7.0",
+    "domhandler": "^4.0.0",
     "htmlparser2": "^6.1.0",
     "node-fetch": "^2.6.1"
   }
