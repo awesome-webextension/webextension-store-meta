@@ -41,7 +41,7 @@
   },
   "homepage": "https://github.com/awesome-webextension/webextension-store-meta#readme",
   "engines": {
-    "node": ">=10.3.0"
+    "node": "^18"
   },
   "devDependencies": {
     "cheerio": "1.0.0-rc.12",
