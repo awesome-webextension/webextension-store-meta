@@ -47,4 +47,4 @@ jobs:
 
       - name: Test 🧪
         run: |
-          npm run test:CI
+          npm run coverage

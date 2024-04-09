@@ -49,7 +49,7 @@ jobs:
 
       - name: Test 🧪
         run: |
-          npm run test:CI
+          npm run coverage
 
       - name: Coveralls
         uses: coverallsapp/github-action@master

@@ -9,7 +9,7 @@
   "scripts": {
     "build": "rm -rf lib && tsc",
     "test": "vitest",
-    "test:CI": "vitest --coverage.enabled --coverage.reporter=lcov --coverage.reporter=text",
+    "coverage": "vitest --coverage.enabled --coverage.reporter=lcov --coverage.reporter=text",
     "lint": "biome lint src/**/* && tsc --noEmit"
   },
   "repository": {
