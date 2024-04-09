@@ -6,7 +6,6 @@
 [![npm-version](https://img.shields.io/npm/v/webextension-store-meta.svg)](https://www.npmjs.com/package/webextension-store-meta)
 [![Build Status](https://github.com/awesome-webextension/webextension-store-meta/actions/workflows/build.yml/badge.svg)](https://github.com/awesome-webextension/webextension-store-meta/actions/workflows/build.yml)
 [![Coverage Status](https://img.shields.io/coveralls/github/awesome-webextension/webextension-store-meta/main)](https://coveralls.io/github/awesome-webextension/webextension-store-meta?branch=main)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 </div>
 
@@ -64,14 +63,14 @@ yarn add webextension-store-meta
 All stores share the same api.
 
 ```js
-const ChromeWebStore = require('webextension-store-meta/lib/chrome-web-store')
+const { ChromeWebStore } = require('webextension-store-meta/lib/chrome-web-store')
 const chromeWebStore = await ChromeWebStore.load({
   id: 'xxxxxxx',
   qs: { hl: 'en' },
 })
 console.log(chromeWebStore.meta())
 
-const Amo = require('webextension-store-meta/lib/amo')
+const { Amo } = require('webextension-store-meta/lib/amo')
 const amo = await Amo.load({ id: 'xxxxxxx' })
 console.log(amo.meta())
 
@@ -93,7 +92,7 @@ result = {
 Get individual property:
 
 ```js
-const Amo = require('webextension-store-meta/lib/amo')
+const { Amo } = require('webextension-store-meta/lib/amo')
 const amo = await Amo.load({ id: 'xxxxxxx' })
 console.log(amo.name())
 console.log(amo.ratingValue())
@@ -103,20 +102,13 @@ Load config:
 
 - **id** `{string}` _required_ - extension id.
 - **qs** `{string|object}` _optional_ - querystring.
-- **options** `object` _optional_ - [node-fetch options](https://www.npmjs.com/package/node-fetch#options).
+- **options** `object` _optional_ - [undici.fetch options](https://undici.nodejs.org/#/?id=undicifetchinput-init-promise).
 
 ## Development
 
 ```bash
-git clone git@github.com:crimx/webextension-store-meta.git
+git clone https://github.com/awesome-webextension/webextension-store-meta.git
 cd webextension-store-meta
 pnpm i
-
-# {--max 5} - max 5 fixtures for each service
-# {--proxy http://xxx:xxx} - http proxy
-# {--force} - always download fixtures, otherwise skip if fixtures dir not empty
-# {--keep} - keep progress result
-pnpm fixtures --keep
-
-pnpm test --watch
+pnpm test
 ```

@@ -1,8 +1,8 @@
 module.exports = {
-  testEnvironment: 'node',
+  testEnvironment: "node",
   collectCoverageFrom: [
-    'lib/**/*.js',
-    '!lib/**/fixtures.js',
-    '!**/node_modules/**',
+    "lib/**/*.js",
+    "!lib/**/fixtures.js",
+    "!**/node_modules/**",
   ],
-}
+};
