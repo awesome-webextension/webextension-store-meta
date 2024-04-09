@@ -85,7 +85,6 @@ describe("Chrome Web Store", async () => {
           id,
           qs: { hl: "zh", lr: "lang_zh-CN" },
         });
-        console.log(chromeWebStore.meta());
         expect(chromeWebStore.meta()).toMatchObject(matchAnyInfo);
         expect(fetchTextMock).toHaveBeenLastCalledWith(
           expect.stringContaining("?hl=zh&lr=lang_zh-CN"),
