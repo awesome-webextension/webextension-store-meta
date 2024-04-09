@@ -1,12 +1,13 @@
 {
   "name": "webextension-store-meta",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Get browser extension(webextension) item meta from Chrome Web Store and Firefox add-ons.",
   "main": "lib/index.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
+    "prepublishOnly": "pnpm run build",
     "build": "rm -rf lib && tsc",
     "test": "vitest",
     "coverage": "vitest --coverage.enabled --coverage.reporter=lcov --coverage.reporter=text",
