@@ -1,3 +1,9 @@
+## [1.2.1] - 2024-04-18
+
+### Updated
+
+- Loosen `engines.node` constraint #5
+
 ## [1.2.0] - 2024-04-10
 
 ### Updated
