@@ -7,7 +7,7 @@
 ## [1.2.0] - 2024-04-10
 
 ### Updated
-- Implement with TypeScript.
+- **Breaking:** Implement with TypeScript. `module.exports` is no longer available. Use named import instead.
 
 ### Fixed
 - Fix #2 UTF-8 `location` header causing infinite redirect loop.
