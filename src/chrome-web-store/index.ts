@@ -148,7 +148,7 @@ export class ChromeWebStore {
 
   public version(): string | null {
     if (!this._cache.has("version")) {
-      const el = queryOne(this.dom, "pDlpAd");
+      const el = queryOne(this.dom, "N3EXSc");
       this._cache.set("version", el ? parseVersion(getText(el)) : null);
     }
 
