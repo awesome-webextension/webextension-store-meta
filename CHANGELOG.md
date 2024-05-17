@@ -1,3 +1,9 @@
+## [1.2.3] - 2024-05-17
+
+### Updated
+- Add a backup method to parse Chrome version from manifest.
+
+
 ## [1.2.2] - 2024-05-17
 
 ### Fixed
