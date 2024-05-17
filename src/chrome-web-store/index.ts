@@ -1,7 +1,7 @@
 import type { RequestInit } from "undici";
 
 import { parse, stringify } from "node:querystring";
-import { DomHandler, type Node, isText } from "domhandler";
+import { DomHandler, type Node, isTag, isText } from "domhandler";
 import { Parser } from "htmlparser2/lib/Parser";
 import { findOne, getText, queryOne } from "../utils/dom";
 import { fetchText } from "../utils/fetch-text";
@@ -149,7 +149,10 @@ export class ChromeWebStore {
   public version(): string | null {
     if (!this._cache.has("version")) {
       const el = queryOne(this.dom, "N3EXSc");
-      this._cache.set("version", el ? parseVersion(getText(el)) : null);
+      this._cache.set(
+        "version",
+        (el && parseVersion(getText(el))) || parseVersionFromManifest(this.dom),
+      );
     }
 
     return this._cache.get("version") ?? null;
@@ -220,5 +223,42 @@ function parseRating(
       return result;
     }
   }
+  return null;
+}
+
+function parseVersionFromManifest(maybeNode: Node | Node[]): string | null {
+  const nodes = Array.isArray(maybeNode) ? maybeNode : [maybeNode];
+
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    if (!isTag(node)) {
+      continue;
+    }
+
+    if (node.tagName === "script") {
+      const content = getText(node);
+      if (content.includes("AF_initDataCallback")) {
+        const match = /"[\\nt\s]*({[\s\S]+})[\\nt\s]*",[\s\w\d]/.exec(content);
+        if (match) {
+          try {
+            const manifest = JSON.parse(match[1].replace(/\n|\\n|\\t|\\/g, ""));
+            if (manifest.version) {
+              return String(manifest.version);
+            }
+          } catch {
+            // do nothing
+          }
+        }
+      }
+    }
+
+    if (node.children.length > 0) {
+      const version = parseVersionFromManifest(node.children);
+      if (version) {
+        return version;
+      }
+    }
+  }
+
   return null;
 }
