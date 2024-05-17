@@ -1,8 +1,14 @@
+## [1.2.2] - 2024-05-17
+
+### Fixed
+- Update chrome version parsing
+
+
 ## [1.2.1] - 2024-04-18
 
 ### Updated
-
 - Loosen `engines.node` constraint #5
+
 
 ## [1.2.0] - 2024-04-10
 

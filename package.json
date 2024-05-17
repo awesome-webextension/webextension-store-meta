@@ -1,6 +1,6 @@
 {
   "name": "webextension-store-meta",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Get browser extension(webextension) item meta from Chrome Web Store and Firefox add-ons.",
   "main": "lib/index.js",
   "directories": {
