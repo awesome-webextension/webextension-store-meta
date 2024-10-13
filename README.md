@@ -52,15 +52,7 @@ npm
 npm add webextension-store-meta
 ```
 
-yarn
-
-```bash
-yarn add webextension-store-meta
-```
-
 ## Usage
-
-All stores share the same api.
 
 ```js
 const { ChromeWebStore } = require('webextension-store-meta/lib/chrome-web-store')
@@ -73,20 +65,6 @@ console.log(chromeWebStore.meta())
 const { Amo } = require('webextension-store-meta/lib/amo')
 const amo = await Amo.load({ id: 'xxxxxxx' })
 console.log(amo.meta())
-
-result = {
-  name: expect.any(String),
-  description: expect.any(String),
-  ratingValue: expect.any(Number),
-  ratingCount: expect.any(Number),
-  users: expect.any(Number),
-  price: expect.any(Number),
-  priceCurrency: expect.any(String),
-  version: expect.any(String),
-  url: expect.any(String),
-  image: expect.any(String),
-  operatingSystem: expect.any(String),
-}
 ```
 
 Get individual property:

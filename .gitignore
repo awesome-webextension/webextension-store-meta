@@ -106,3 +106,5 @@ dist
 .fixtures
 
 lib/
+
+docs/
