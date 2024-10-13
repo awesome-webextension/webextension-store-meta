@@ -1,3 +1,8 @@
+## [1.2.4] - 2024-10-13
+
+### Added
+- Add `size` and `lastUpdated` [#8](https://github.com/awesome-webextension/webextension-store-meta/issues/8).
+
 ## [1.2.3] - 2024-05-17
 
 ### Updated
