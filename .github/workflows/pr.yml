@@ -6,9 +6,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: ['18', '20']
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
@@ -18,7 +15,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 20
           cache: pnpm
 
       - name: Install dependencies 📦
