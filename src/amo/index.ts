@@ -39,6 +39,8 @@ export interface AmoMeta {
   url: string | null;
   image: string | null;
   operatingSystem: string | null;
+  size: string | null;
+  lastUpdated: string | null;
 }
 
 export class Amo {
@@ -156,6 +158,8 @@ export class Amo {
       url: this.url(),
       image: this.image(),
       operatingSystem: this.operatingSystem(),
+      size: this.size(),
+      lastUpdated: this.lastUpdated(),
     };
   }
 
@@ -277,6 +281,14 @@ export class Amo {
 
   public operatingSystem(): string | null {
     return this._itemprop("operatingSystem") || null;
+  }
+  
+  public size(): string | null {
+    return getText(queryOne(this.dom, "AddonMoreInfo-filesize")) || null;
+  }
+  
+  public lastUpdated(): string | null {
+    return getText(queryOne(this.dom, "AddonMoreInfo-last-updated")) || null;
   }
 
   public get dom() {

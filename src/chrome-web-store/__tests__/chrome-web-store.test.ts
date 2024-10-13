@@ -52,6 +52,8 @@ describe("Chrome Web Store", async () => {
       ratingValue: null,
       ratingCount: null,
       version: null,
+      size: null,
+      lastUpdated: null,
     });
   });
 
@@ -64,6 +66,8 @@ describe("Chrome Web Store", async () => {
     version: expect.any(String),
     url: expect.any(String),
     image: expect.any(String),
+    size: expect.any(String),
+    lastUpdated: expect.any(String),
   };
 
   describe.each(await fixtures())(

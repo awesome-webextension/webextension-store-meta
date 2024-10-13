@@ -18,6 +18,8 @@ export interface ChromeWebStoreMeta {
   ratingCount: string | null;
   users: string | null;
   version: string | null;
+  size: string | null;
+  lastUpdated: string | null;
 }
 
 export interface ChromeWebStoreOptions {
@@ -80,6 +82,8 @@ export class ChromeWebStore {
       ratingCount: this.ratingCount(),
       users: this.users(),
       version: this.version(),
+      size: this.size(),
+      lastUpdated: this.lastUpdated(),
     };
   }
 
@@ -156,6 +160,24 @@ export class ChromeWebStore {
     }
 
     return this._cache.get("version") ?? null;
+  }
+  
+  public size(): string | null {
+    if (!this._cache.has("size")) {
+      const el = queryOne(this.dom, "ZSMSLb");
+      this._cache.set("size", getText(el?.lastChild) || null)
+    }
+
+    return this._cache.get("size") ?? null;
+  }
+  
+  public lastUpdated(): string | null {
+    if (!this._cache.has("lastUpdated")) {
+      const el = queryOne(this.dom, "uBIrad");
+      this._cache.set("lastUpdated", getText(el?.lastChild) || null)
+    }
+
+    return this._cache.get("lastUpdated") ?? null;
   }
 
   public get dom() {

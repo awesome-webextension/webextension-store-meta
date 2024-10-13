@@ -108,6 +108,8 @@ describe("Amo", async () => {
       priceCurrency: null,
       version: null,
       operatingSystem: null,
+      size: null,
+      lastUpdated: null,
     });
   });
 
@@ -123,6 +125,8 @@ describe("Amo", async () => {
     url: expect.any(String),
     image: expect.any(String),
     operatingSystem: expect.any(String),
+    size: expect.any(String),
+    lastUpdated: expect.any(String),
   };
 
   describe.each(await fixtures())(
