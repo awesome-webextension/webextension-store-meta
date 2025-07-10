@@ -4,6 +4,8 @@ const IDs = [
   "cdonnmffkdaoajfknoeeecmchibpmkmg",
   // https://github.com/awesome-webextension/webextension-store-meta/pull/3
   "ekbmhggedfdlajiikminikhcjffbleac",
+  // https://github.com/awesome-webextension/webextension-store-meta/pull/9
+  "modkelfkcfjpgbfmnbnllalkiogfofhb",
 ];
 
 export async function fixtures(): Promise<string[]> {
