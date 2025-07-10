@@ -3,8 +3,10 @@ import { type MockedFunction, describe, expect, it, vi } from "vitest";
 import { ChromeWebStore } from "../";
 import { fetchText } from "../../utils/fetch-text";
 import { fixtures } from "./fixtures";
+import process from "node:process";
 
 const fetchTextMock = fetchText as MockedFunction<typeof fetchText>;
+
 
 vi.mock("../../utils/fetch-text", () => {
   const cache = new Map<string, string>();
@@ -22,39 +24,44 @@ vi.mock("../../utils/fetch-text", () => {
 
 describe("Chrome Web Store", async () => {
   it("should extract og", async () => {
-    const og = {
-      type: "website",
-      url: "https://example.com/url",
-      title: "title",
-      image: "https://example.com/image.jpg",
-      description: "description",
-    };
+    process.env.allowVersionFallback = "true";
+    try {
+      const og = {
+        type: "website",
+        url: "https://example.com/url",
+        title: "title",
+        image: "https://example.com/image.jpg",
+        description: "description",
+      };
 
-    fetchTextMock.mockResolvedValueOnce(`
+      fetchTextMock.mockResolvedValueOnce(`
       <!DOCTYPE html>
       <html>
         <head>
           ${Object.entries(og).map(
-            ([property, value]) =>
+          ([property, value]) =>
               `<meta property="og:${property}" content="${value}"/>`,
-          )}
+      )}
         </head>
       </html>
     `);
 
-    const chromeWebStore = await ChromeWebStore.load({ id: "xxx" });
-    expect(chromeWebStore.meta()).toMatchObject({
-      name: og.title,
-      description: og.description,
-      url: og.url,
-      image: og.image,
-      users: null,
-      ratingValue: null,
-      ratingCount: null,
-      version: null,
-      size: null,
-      lastUpdated: null,
-    });
+      const chromeWebStore = await ChromeWebStore.load({id: "xxx"});
+      expect(chromeWebStore.meta()).toMatchObject({
+        name: og.title,
+        description: og.description,
+        url: og.url,
+        image: og.image,
+        users: null,
+        ratingValue: null,
+        ratingCount: null,
+        version: null,
+        size: null,
+        lastUpdated: null,
+      });
+    } finally {
+        delete process.env.allowVersionFallback;
+    }
   });
 
   const matchAnyInfo = {
