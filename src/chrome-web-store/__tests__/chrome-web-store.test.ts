@@ -60,7 +60,7 @@ describe("Chrome Web Store", async () => {
         lastUpdated: null,
       });
     } finally {
-        delete process.env.allowVersionFallback;
+      process.env.allowVersionFallback = undefined;
     }
   });
 
@@ -114,7 +114,7 @@ describe("Chrome Web Store", async () => {
           const versionFallback = chromeWebStore.versionFallback();
           expect(versionFallback).toBe(version);
         } finally {
-            delete process.env.allowVersionFallback;
+          process.env.allowVersionFallback = undefined;
         }
 
 
