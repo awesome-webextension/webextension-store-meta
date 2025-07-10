@@ -152,7 +152,7 @@ export class ChromeWebStore {
 
   public version(): string | null {
     if (!this._cache.has("version")) {
-      const el = queryOne(this.dom, "N3EXSc");
+      const el = queryOne(this.dom, "nBZElf");
       this._cache.set(
         "version",
         (el && parseVersion(getText(el))) || parseVersionFromManifest(this.dom),
