@@ -6,6 +6,8 @@ import { Parser } from "htmlparser2/lib/Parser";
 import { findOne, getText, queryOne } from "../utils/dom";
 import { fetchText } from "../utils/fetch-text";
 import { parseVersion } from "../utils/parse";
+import JSON5 from "json5";
+import * as process from "node:process";
 
 export type { RequestInit };
 
@@ -150,18 +152,88 @@ export class ChromeWebStore {
     return this._cache.get("users") ?? null;
   }
 
+  private readonly versionClassName = "nBZElf";
+
   public version(): string | null {
     if (!this._cache.has("version")) {
-      const el = queryOne(this.dom, "nBZElf") || queryOne(this.dom, "N3EXSc");
+      const el = queryOne(this.dom, this.versionClassName) || queryOne(this.dom, "N3EXSc");
       this._cache.set(
         "version",
-        (el && parseVersion(getText(el))) || parseVersionFromManifest(this.dom),
+        (el && parseVersion(getText(el))) || this.versionFallback(),
       );
     }
 
     return this._cache.get("version") ?? null;
   }
-  
+
+  /**
+   * Fallback method for extracting the extension version from a Chrome Web Store detail page.
+   *
+   * This function searches for a <script class="ds:0"> element, which contains a JS literal of the form
+   * `AF_initDataCallback({ ... });`. The literal is parsed as a string, and the inner object is extracted.
+   *   <script class="ds:0" nonce>AF_initDataCallback(...);</script>
+   *
+   * The manifest JSON string is located at the last element of `data[0]` in the parsed object.
+   * The function parses this manifest string and returns the `version` field.
+   *   {
+   *     key: 'ds:0',
+   *     hash: '2',
+   *     data: [
+   *       [
+   *         ...,
+   *         "{\n \"version": \"7.20.0\n ...\n}",
+   *       ],
+   *       ...,
+   *     ],
+   *     sideChannel: {}
+   *   }
+   */
+  private versionFallback(): string | null {
+    // Warn in vitest if execution reaches here
+    if (process.env.VITEST && process.env.VITEST === "true" && !process.env.allowVersionFallback) {
+      throw new Error("fallback method is being used, please check if versionClassName is correct. (" + this.versionClassName + ")");
+    }
+    const AF_initDataCallbackEl = queryOne(this.dom, "ds:0");
+    const rawText = getText(AF_initDataCallbackEl);
+
+    if (!(rawText.startsWith("AF_initDataCallback(") && rawText.endsWith(");"))) {
+      //AF_initDataCallbackEl does not match an expected format
+      return null;
+    }
+
+    const match = rawText.slice("AF_initDataCallback(".length, -2);
+    try {
+      // Use JSON5 to parse JS literals
+      const callbackData = JSON5.parse(match);
+      if (!callbackData.data || !callbackData.data[0] || !Array.isArray(callbackData.data[0])) {
+          return null;
+      }
+
+      try {
+        const manifest = JSON.parse(callbackData.data[0][callbackData.data[0].length - 1]);
+        const version = manifest.version;
+        return String(version);
+      } catch {
+        return null;
+      }
+    } catch (e) {
+      // Ignore JSON parsing errors
+
+      // console.error("Error parsing version from manifest:", e);
+      // if(e.columnNumber && e.lineNumber) {
+      //   console.error(`Error at line ${e.lineNumber}, column ${e.columnNumber}`);
+      //   // print range from column -20 ~ 20
+      //   const lines = match.split("\n");
+      //   const line = lines[e.lineNumber - 1] || "";
+      //   const start = Math.max(0, e.columnNumber - 20);
+      //   const end = Math.min(line.length, e.columnNumber + 20);
+      //   console.error(`Error context: "${line.slice(start, end)}"`);
+      // }
+    }
+
+    return null;
+  }
+
   public size(): string | null {
     if (!this._cache.has("size")) {
       const el = queryOne(this.dom, "ZSMSLb");
@@ -170,7 +242,7 @@ export class ChromeWebStore {
 
     return this._cache.get("size") ?? null;
   }
-  
+
   public lastUpdated(): string | null {
     if (!this._cache.has("lastUpdated")) {
       const el = queryOne(this.dom, "uBIrad");
@@ -245,42 +317,5 @@ function parseRating(
       return result;
     }
   }
-  return null;
-}
-
-function parseVersionFromManifest(maybeNode: Node | Node[]): string | null {
-  const nodes = Array.isArray(maybeNode) ? maybeNode : [maybeNode];
-
-  for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i];
-    if (!isTag(node)) {
-      continue;
-    }
-
-    if (node.tagName === "script") {
-      const content = getText(node);
-      if (content.includes("AF_initDataCallback")) {
-        const match = /"[\\nt\s]*({[\s\S]+})[\\nt\s]*",[\s\w\d]/.exec(content);
-        if (match) {
-          try {
-            const manifest = JSON.parse(match[1].replace(/\n|\\n|\\t|\\/g, ""));
-            if (manifest.version) {
-              return String(manifest.version);
-            }
-          } catch {
-            // do nothing
-          }
-        }
-      }
-    }
-
-    if (node.children.length > 0) {
-      const version = parseVersionFromManifest(node.children);
-      if (version) {
-        return version;
-      }
-    }
-  }
-
   return null;
 }

@@ -57,6 +57,7 @@
   "dependencies": {
     "domhandler": "^4.0.0",
     "htmlparser2": "^6.1.0",
+    "json5": "^2.2.3",
     "undici": "^6.11.1"
   },
   "packageManager": "pnpm@9.12.0"
