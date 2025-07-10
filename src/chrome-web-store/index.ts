@@ -191,7 +191,7 @@ export class ChromeWebStore {
   private versionFallback(): string | null {
     // Warn in vitest if execution reaches here
     if (process.env.VITEST && process.env.VITEST === "true" && !process.env.allowVersionFallback) {
-      throw new Error("fallback method is being used, please check if versionClassName is correct. (" + this.versionClassName + ")");
+      throw new Error(`fallback method is being used, please check if versionClassName is correct. (${this.versionClassName})`);
     }
     const AF_initDataCallbackEl = queryOne(this.dom, "ds:0");
     const rawText = getText(AF_initDataCallbackEl);
