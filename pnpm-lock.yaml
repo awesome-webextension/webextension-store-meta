@@ -14,6 +14,9 @@ importers:
       htmlparser2:
         specifier: ^6.1.0
         version: 6.1.0
+      json5:
+        specifier: ^2.2.3
+        version: 2.2.3
       undici:
         specifier: ^6.11.1
         version: 6.11.1
@@ -574,6 +577,11 @@ packages:
 
   js-tokens@9.0.0:
     resolution: {integrity: sha512-WriZw1luRMlmV3LGJaR6QOJjWwgLUTf89OwT2lUOyjX2dJGBwgmIkbcz+7WFZjrZM635JOIR517++e/67CP9dQ==}
+
+  json5@2.2.3:
+    resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
+    engines: {node: '>=6'}
+    hasBin: true
 
   jsonc-parser@3.2.0:
     resolution: {integrity: sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==}
@@ -1372,6 +1380,8 @@ snapshots:
       istanbul-lib-report: 3.0.1
 
   js-tokens@9.0.0: {}
+
+  json5@2.2.3: {}
 
   jsonc-parser@3.2.0: {}
 
