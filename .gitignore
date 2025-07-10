@@ -108,3 +108,6 @@ dist
 lib/
 
 docs/
+
+# Jetbrains
+/.idea
