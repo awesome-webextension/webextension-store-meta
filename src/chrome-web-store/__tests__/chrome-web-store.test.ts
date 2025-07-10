@@ -103,9 +103,27 @@ describe("Chrome Web Store", async () => {
         );
       });
 
-      it("should throw error if document is not loaded", () => {
+      it("should throw error if document is not loaded", async () => {
+        try {
+          const chromeWebStore = new ChromeWebStore({ id });
+          await chromeWebStore.load();
+          const version = chromeWebStore.version();
+
+          process.env.allowVersionFallback = "true";
+          // @ts-ignore
+          const versionFallback = chromeWebStore.versionFallback();
+          expect(versionFallback).toBe(version);
+        } finally {
+            delete process.env.allowVersionFallback;
+        }
+
+
+      });
+
+      it("should available versionFallback ", async () => {
         const chromeWebStore = new ChromeWebStore({ id });
-        expect(() => chromeWebStore.meta()).toThrow();
+        await chromeWebStore.load();
+        expect(chromeWebStore.meta()).toMatchObject(matchAnyInfo);
       });
     },
     20000,
