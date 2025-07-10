@@ -1,3 +1,9 @@
+## [1.2.5] - 2025-07-10
+
+### Fixed
+
+- Update Chrome version parsing to handle new manifest format. [#9](https://github.com/awesome-webextension/webextension-store-meta/issues/9).
+
 ## [1.2.4] - 2024-10-13
 
 ### Added
