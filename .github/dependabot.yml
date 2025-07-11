@@ -10,3 +10,10 @@ updates:
     versioning-strategy: "increase"
     schedule:
       interval: "monthly"
+    groups:
+      dev-dependencies:
+        patterns:
+          - "*"
+      dependencies:
+        patterns:
+          - "*"
