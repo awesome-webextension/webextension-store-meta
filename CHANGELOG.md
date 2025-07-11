@@ -1,3 +1,8 @@
+## [1.2.7] - 2025-07-11
+
+### Reverted
+- Support Node 18 (badgen)
+
 ## [1.2.6] - 2025-07-11
 
 ### Fixed
