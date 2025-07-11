@@ -1,5 +1,5 @@
 {
-  "name": "Node.js + pnpm",
+  "name": "Node.js",
   // "Officially" maintained node devcontainer image from Microsoft
   // https://github.com/devcontainers/templates/tree/main/src/javascript-node
   // https://mcr.microsoft.com/en-us/artifact/mar/devcontainers/javascript-node/tags
@@ -10,5 +10,5 @@
     "ghcr.io/devcontainers-extra/features/pnpm:2": {}
   },
 
-  "postCreateCommand": "pnpm install",
+  "postCreateCommand": "npm install",
 }

@@ -10,10 +10,3 @@ updates:
     versioning-strategy: "increase"
     schedule:
       interval: "monthly"
-    ignore:
-      - dependency-name: "domhandler"
-        versions: ["*"]
-      - dependency-name: "htmlparser2"
-        versions: ["*"]
-      - dependency-name: "undici"
-        versions: ["*"]

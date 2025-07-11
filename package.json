@@ -7,8 +7,9 @@
     "lib": "lib"
   },
   "scripts": {
-    "prepublishOnly": "pnpm run build",
+    "prepublishOnly": "npm run build",
     "build": "rm -rf lib && tsc",
+    "ts-check": "tsc --noEmit",
     "test": "vitest",
     "docs": "typedoc --options typedoc.json",
     "coverage": "vitest --coverage.enabled --coverage.reporter=lcov --coverage.reporter=text",
@@ -58,6 +59,5 @@
     "domhandler": "^4.0.0",
     "htmlparser2": "^6.1.0",
     "undici": "^6.11.1"
-  },
-  "packageManager": "pnpm@9.12.0"
+  }
 }

@@ -12,25 +12,24 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Install pnpm 📦
-        uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
+          cache: npm
 
       - name: Install dependencies 📦
-        run: pnpm install
+        run: npm ci
 
       - name: Lint 🧹
-        run: pnpm run lint
+        run: |
+          npm run lint
+          npm run ts-check
 
       - name: Build 🔧
-        run: pnpm run build
+        run: npm run build
 
       - name: Test 🧪
-        run: pnpm run coverage
+        run: npm run coverage
 
       - name: Coveralls 🎉
         uses: coverallsapp/github-action@v2
@@ -38,7 +37,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docs 📖
-        run: pnpm run docs
+        run: npm run docs
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
