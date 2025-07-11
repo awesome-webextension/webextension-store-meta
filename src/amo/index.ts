@@ -126,7 +126,7 @@ export class Amo {
               priceCurrency == null ? null : priceCurrency;
           }
         }
-      } catch (e) {
+      } catch {
         // ignore corrupted schema
       }
     }
