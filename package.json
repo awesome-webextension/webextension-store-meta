@@ -58,6 +58,6 @@
   "dependencies": {
     "domhandler": "^4.0.0",
     "htmlparser2": "^6.1.0",
-    "undici": "^6.11.1"
+    "undici": "^7.11.0"
   }
 }
