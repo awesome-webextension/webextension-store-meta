@@ -1,3 +1,8 @@
+## [1.2.6] - 2025-07-11
+
+### Fixed
+- Update Chrome manifest version parsing.
+
 ## [1.2.5] - 2025-07-10
 
 ### Fixed
