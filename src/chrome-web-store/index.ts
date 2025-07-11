@@ -2,7 +2,7 @@ import type { RequestInit } from "undici";
 
 import { parse, stringify } from "node:querystring";
 import { DomHandler, type Node, isTag, isText } from "domhandler";
-import { Parser } from "htmlparser2/lib/Parser";
+import { Parser } from "htmlparser2";
 import { findOne, getText, queryOne } from "../utils/dom";
 import { fetchText } from "../utils/fetch-text";
 import { parseVersion } from "../utils/parse";
