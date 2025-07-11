@@ -260,16 +260,9 @@ function parseVersionFromManifest(maybeNode: Node | Node[]): string | null {
     if (node.tagName === "script") {
       const content = getText(node);
       if (content.includes("AF_initDataCallback")) {
-        const match = /"[\\nt\s]*({[\s\S]+})[\\nt\s]*",[\s\w\d]/.exec(content);
+        const match = /\\"version\\":\s*\\"([\d.]+)\\"/.exec(content);
         if (match) {
-          try {
-            const manifest = JSON.parse(match[1].replace(/\n|\\n|\\t|\\/g, ""));
-            if (manifest.version) {
-              return String(manifest.version);
-            }
-          } catch {
-            // do nothing
-          }
+          return match[1];
         }
       }
     }
