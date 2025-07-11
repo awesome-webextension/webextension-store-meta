@@ -32,10 +32,10 @@ importers:
         version: 1.1.0
       typedoc:
         specifier: ^0.26.6
-        version: 0.26.6(typescript@5.3.3)
+        version: 0.26.6(typescript@5.5.4)
       typescript:
-        specifier: ^5.3.3
-        version: 5.3.3
+        specifier: ^5.5.4
+        version: 5.5.4
       vitest:
         specifier: ^1.5.0
         version: 1.5.0(@types/node@20.1.7)
@@ -803,8 +803,8 @@ packages:
     peerDependencies:
       typescript: 4.6.x || 4.7.x || 4.8.x || 4.9.x || 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x
 
-  typescript@5.3.3:
-    resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
+  typescript@5.5.4:
+    resolution: {integrity: sha512-Mtq29sKDAEYP7aljRgtPOpTvOfbwRWlS6dPRzwjdE+C0R4brX/GUyhHSecbHMFLNBLcJIPt9nl9yG5TZ1weH+Q==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -1629,16 +1629,16 @@ snapshots:
 
   type-detect@4.0.8: {}
 
-  typedoc@0.26.6(typescript@5.3.3):
+  typedoc@0.26.6(typescript@5.5.4):
     dependencies:
       lunr: 2.3.9
       markdown-it: 14.1.0
       minimatch: 9.0.5
       shiki: 1.12.1
-      typescript: 5.3.3
+      typescript: 5.5.4
       yaml: 2.5.0
 
-  typescript@5.3.3: {}
+  typescript@5.5.4: {}
 
   uc.micro@2.1.0: {}
 
