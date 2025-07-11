@@ -1,6 +1,6 @@
 import { stringify } from "node:querystring";
 import { type DataNode, DomHandler, type Node } from "domhandler";
-import { Parser } from "htmlparser2";
+import { Parser } from "htmlparser2/lib/Parser";
 import type { RequestInit } from "undici";
 import { findOne, getText, queryOne } from "../utils/dom";
 import { fetchText } from "../utils/fetch-text";
