@@ -1,3 +1,9 @@
+## [1.2.8] - 2025-07-25
+
+### Fixed
+
+- Support new AMO store info.
+
 ## [1.2.7] - 2025-07-11
 
 ### Reverted
