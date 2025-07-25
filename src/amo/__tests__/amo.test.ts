@@ -1,8 +1,8 @@
 import { load } from "cheerio";
-import { type RequestInit, fetch } from "undici";
-import { type MockedFunction, describe, expect, it, vi } from "vitest";
-import { Amo } from "../";
+import { fetch, type RequestInit } from "undici";
+import { describe, expect, it, type MockedFunction, vi } from "vitest";
 import { fetchText } from "../../utils/fetch-text";
+import { Amo } from "../";
 import { fixtures } from "./fixtures";
 
 const fetchTextMock = fetchText as MockedFunction<typeof fetchText>;
@@ -22,97 +22,6 @@ vi.mock("../../utils/fetch-text", () => {
 });
 
 describe("Amo", async () => {
-  it("should extract itemprop schema", async () => {
-    const schema = {
-      "@context": "http://schema.org",
-      "@type": "WebApplication",
-      applicationCategory: "http://schema.org/OtherApplication",
-      name: "name",
-      description: "description",
-      url: "https://example.com/url",
-      image: "https://example.com/image.jpg",
-      operatingSystem: "Firefox",
-      offers: {
-        "@type": "Offer",
-        availability: "http://schema.org/InStock",
-        price: 404,
-        priceCurrency: "USD",
-      },
-      version: "1.2.3",
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingCount: 202,
-        ratingValue: 3.8,
-      },
-    };
-
-    fetchTextMock.mockResolvedValueOnce(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <script data-react-helmet="true" type="application/ld+json">
-          ${JSON.stringify(schema)}
-          </script>
-        </head>
-      </html>
-    `);
-
-    const amo = await Amo.load({ id: "xxx" });
-    expect(amo.meta()).toMatchObject({
-      users: null,
-      name: schema.name,
-      description: schema.description,
-      ratingValue: schema.aggregateRating.ratingValue,
-      ratingCount: schema.aggregateRating.ratingCount,
-      price: schema.offers.price,
-      priceCurrency: schema.offers.priceCurrency,
-      version: schema.version,
-      url: schema.url,
-      image: schema.image,
-      operatingSystem: schema.operatingSystem,
-    });
-  });
-
-  it("should extract og", async () => {
-    const og = {
-      type: "website",
-      url: "https://example.com/url",
-      title: "title",
-      locale: "en-US",
-      image: "https://example.com/image.jpg",
-      description: "description",
-    };
-
-    fetchTextMock.mockResolvedValueOnce(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          ${Object.entries(og).map(
-            ([property, value]) =>
-              `<meta property="og:${property}" content="${value}"/>`,
-          )}
-        </head>
-      </html>
-    `);
-
-    const amo = await Amo.load({ id: "xxx" });
-    expect(amo.meta()).toMatchObject({
-      name: og.title,
-      description: og.description,
-      url: og.url,
-      image: og.image,
-      users: null,
-      ratingValue: null,
-      ratingCount: null,
-      price: null,
-      priceCurrency: null,
-      version: null,
-      operatingSystem: null,
-      size: null,
-      lastUpdated: null,
-    });
-  });
-
   const matchAnyInfo = {
     name: expect.any(String),
     description: expect.any(String),
@@ -136,6 +45,51 @@ describe("Amo", async () => {
         const amo = new Amo({ id: extId });
         await amo.load();
         expect(amo.meta()).toMatchObject(matchAnyInfo);
+
+        expect(amo.sourceDOM.name()).toEqual(expect.any(String));
+        expect(amo.sourceDOM.description()).toEqual(expect.any(String));
+        expect(amo.sourceDOM.ratingValue()).toEqual(expect.any(Number));
+        expect(amo.sourceDOM.ratingCount()).toEqual(expect.any(Number));
+        expect(amo.sourceDOM.users()).toEqual(expect.any(Number));
+        expect(amo.sourceDOM.version()).toEqual(expect.any(String));
+        expect(amo.sourceDOM.url()).toEqual(expect.any(String));
+        expect(amo.sourceDOM.image()).toEqual(expect.any(String));
+        expect(amo.sourceDOM.size()).toEqual(expect.any(String));
+        expect(amo.sourceDOM.lastUpdated()).toEqual(expect.any(String));
+
+        expect(amo.sourceJSONLD.name()).toEqual(expect.any(String));
+        expect(amo.sourceJSONLD.description()).toEqual(expect.any(String));
+        expect(amo.sourceJSONLD.ratingValue()).toEqual(expect.any(Number));
+        expect(amo.sourceJSONLD.ratingCount()).toEqual(expect.any(Number));
+        expect(amo.sourceJSONLD.price()).toEqual(expect.any(Number));
+        expect(amo.sourceJSONLD.priceCurrency()).toEqual(expect.any(String));
+        expect(amo.sourceJSONLD.version()).toEqual(expect.any(String));
+        expect(amo.sourceJSONLD.url()).toEqual(expect.any(String));
+        expect(amo.sourceJSONLD.image()).toEqual(expect.any(String));
+        expect(amo.sourceJSONLD.operatingSystem()).toEqual(expect.any(String));
+
+        expect(amo.sourceReduxStoreState.name()).toEqual(expect.any(String));
+        expect(amo.sourceReduxStoreState.description()).toEqual(
+          expect.any(String),
+        );
+        expect(amo.sourceReduxStoreState.ratingValue()).toEqual(
+          expect.any(Number),
+        );
+        expect(amo.sourceReduxStoreState.ratingCount()).toEqual(
+          expect.any(Number),
+        );
+        expect(amo.sourceReduxStoreState.users()).toEqual(expect.any(Number));
+        expect(amo.sourceReduxStoreState.version()).toEqual(expect.any(String));
+        expect(amo.sourceReduxStoreState.url()).toEqual(expect.any(String));
+        expect(amo.sourceReduxStoreState.image()).toEqual(expect.any(String));
+        expect(amo.sourceReduxStoreState.size()).toEqual(expect.any(String));
+        expect(amo.sourceReduxStoreState.lastUpdated()).toEqual(
+          expect.any(String),
+        );
+
+        expect(amo.sourceOG.description()).toEqual(expect.any(String));
+        expect(amo.sourceOG.url()).toEqual(expect.any(String));
+        expect(amo.sourceOG.image()).toEqual(expect.any(String));
       });
 
       it("should also return ext info with static `load` shortcut", async () => {

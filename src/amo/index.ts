@@ -1,10 +1,12 @@
 import { stringify } from "node:querystring";
-import { type DataNode, DomHandler, type Node } from "domhandler";
+import { DomHandler, type Node } from "domhandler";
 import { Parser } from "htmlparser2/lib/Parser";
 import type { RequestInit } from "undici";
-import { findOne, getText, queryOne } from "../utils/dom";
 import { fetchText } from "../utils/fetch-text";
-import { parseNum, parseVersion } from "../utils/parse";
+import { SourceDOM } from "./SourceDOM";
+import { SourceJSONLD } from "./SourceJSONLD";
+import { SourceOG } from "./SourceOG";
+import { SourceReduxStoreState } from "./SourceReduxStoreState";
 
 export interface AmoOptions {
   /**
@@ -33,7 +35,7 @@ export interface AmoMeta {
   ratingValue: number | null;
   ratingCount: number | null;
   users: number | null;
-  price: string | null;
+  price: number | null;
   priceCurrency: string | null;
   version: string | null;
   url: string | null;
@@ -45,24 +47,6 @@ export interface AmoMeta {
 
 export class Amo {
   public config: AmoOptions;
-
-  private _itempropMemo: {
-    name?: string | null;
-    description?: string | null;
-    url?: string | null;
-    image?: string | null;
-    operatingSystem?: string | null;
-    aggregateRating?: { ratingValue?: number; ratingCount?: number };
-    ratingValue?: number | null;
-    ratingCount?: number | null;
-    offers?: { price?: string; priceCurrency?: string };
-    price?: string | null;
-    priceCurrency?: string | null;
-  } & { [K in string]?: string | null } = {};
-
-  private _ogMemo: Record<string, string | null> = {};
-
-  private _dom: Node[] | null = null;
 
   public constructor(config: AmoOptions) {
     this.config = config || {};
@@ -93,59 +77,10 @@ export class Amo {
     new Parser(handler).end(html);
     this._dom = handler.dom;
 
-    const schema = findOne(
-      (elem) =>
-        elem.name === "script" && elem.attribs.type === "application/ld+json",
-      this._dom,
-    );
-
-    if (schema) {
-      try {
-        this._itempropMemo = JSON.parse((schema.children[0] as DataNode).data);
-
-        if (this._itempropMemo.aggregateRating) {
-          const { ratingValue, ratingCount } =
-            this._itempropMemo.aggregateRating;
-          if (this._itempropMemo.ratingValue == null) {
-            this._itempropMemo.ratingValue =
-              ratingValue == null ? null : ratingValue;
-          }
-          if (this._itempropMemo.ratingCount == null) {
-            this._itempropMemo.ratingCount =
-              ratingCount == null ? null : ratingCount;
-          }
-        }
-
-        if (this._itempropMemo.offers) {
-          const { price, priceCurrency } = this._itempropMemo.offers;
-          if (this._itempropMemo.price == null) {
-            this._itempropMemo.price = price == null ? null : price;
-          }
-          if (this._itempropMemo.priceCurrency == null) {
-            this._itempropMemo.priceCurrency =
-              priceCurrency == null ? null : priceCurrency;
-          }
-        }
-      } catch {
-        // ignore corrupted schema
-      }
-    }
-
     return this;
   }
 
   public meta(): AmoMeta {
-    // fill cache all at once to reduce DOM traversal times.
-    findOne((elem) => {
-      const { itemprop, property, content } = elem.attribs;
-      if (itemprop && this._itempropMemo[itemprop] == null) {
-        this._itempropMemo[itemprop] = content;
-      } else if (property) {
-        this._ogMemo[property] = content;
-      }
-      return false;
-    }, this.dom);
-
     return {
       name: this.name(),
       description: this.description(),
@@ -164,132 +99,92 @@ export class Amo {
   }
 
   public name(): string | null {
-    let name = this._itemprop("name") || this._og("og:title");
-    if (name) return name;
-
-    const title = queryOne(this.dom, "AddonTitle");
-    if (title) {
-      name = getText(title)
-        .replace(getText(queryOne(title, "AddonTitle-author")), "")
-        .trim();
-      if (name) return name;
-    }
-
-    return null;
+    return (
+      this.sourceReduxStoreState.name() ||
+      this.sourceJSONLD.name() ||
+      this.sourceDOM.name()
+    );
   }
 
   public description(): string | null {
-    let des = this._itemprop("description");
-    if (des) return des;
-
-    des = getText(queryOne(this.dom, "Addon-summary"));
-    if (des) return des;
-
-    // og and meta have extra prefix
-
-    des = this._og("og:description");
-    if (des) return des;
-
-    const desElem = findOne(
-      (elem) => elem.name === "meta" && elem.attribs.name === "Description",
-      this.dom,
+    return (
+      this.sourceReduxStoreState.description() ||
+      this.sourceJSONLD.description() ||
+      this.sourceOG.description() ||
+      this.sourceDOM.description()
     );
-    if (desElem) {
-      des = desElem.attribs.content;
-      if (des) return des;
-    }
-
-    return null;
   }
 
   public ratingValue(): number | null {
-    let ratingValue = parseNum(this._itemprop("ratingValue"));
-    if (ratingValue >= 0 && ratingValue <= 5) return ratingValue;
-
-    ratingValue = parseNum(
-      getText(queryOne(this.dom, "AddonMeta-rating-title")),
+    return (
+      this.sourceReduxStoreState.ratingValue() ||
+      this.sourceJSONLD.ratingValue() ||
+      this.sourceDOM.ratingValue()
     );
-    if (ratingValue >= 0 && ratingValue <= 5) return ratingValue;
-
-    return null;
   }
 
   public ratingCount(): number | null {
-    let ratingCount = parseNum(this._itemprop("ratingCount"));
-    if (ratingCount >= 0) return ratingCount;
-
-    ratingCount = parseNum(
-      getText(queryOne(this.dom, "AddonMeta-reviews-content-link")),
+    return (
+      this.sourceReduxStoreState.ratingCount() ||
+      this.sourceJSONLD.ratingCount() ||
+      this.sourceDOM.ratingCount()
     );
-    if (ratingCount >= 0) return ratingCount;
-
-    return null;
   }
 
   public users(): number | null {
-    const users = parseNum(getText(queryOne(this.dom, "MetadataCard-content")));
-    if (users >= 0) return users;
-
-    return null;
+    return this.sourceReduxStoreState.users() || this.sourceDOM.users();
   }
 
-  public price(): string | null {
-    const price = this._itemprop("price");
-    if (price != null) return price;
-
-    return null;
+  public price(): number | null {
+    return this.sourceJSONLD.price();
   }
 
   public priceCurrency(): string | null {
-    const priceCurrency = this._itemprop("priceCurrency");
-    if (priceCurrency != null) return priceCurrency;
-
-    return null;
+    return this.sourceJSONLD.priceCurrency();
   }
 
   public version(): string | null {
-    let version = this._itemprop("version");
-    if (version) return version;
-
-    version = parseVersion(
-      getText(queryOne(this.dom, "AddonMoreInfo-version")),
+    return (
+      this.sourceReduxStoreState.version() ||
+      this.sourceJSONLD.version() ||
+      this.sourceDOM.version()
     );
-    if (version) return version;
-
-    return null;
   }
 
   public url(): string | null {
-    let url = this._itemprop("url") || this._og("og:url");
-    if (url) return url;
-
-    const urlElem = findOne(
-      (elem) => elem.name === "link" && elem.attribs.rel === "canonical",
-      this.dom,
+    return (
+      this.sourceReduxStoreState.url() ||
+      this.sourceJSONLD.url() ||
+      this.sourceOG.url() ||
+      this.sourceDOM.url()
     );
-    if (urlElem) {
-      url = urlElem.attribs.href;
-      if (url) return url;
-    }
-
-    return null;
   }
 
   public image(): string | null {
-    return this._itemprop("image") || this._og("og:image") || null;
+    return (
+      this.sourceReduxStoreState.image() ||
+      this.sourceJSONLD.image() ||
+      this.sourceOG.image() ||
+      this.sourceDOM.image()
+    );
   }
 
   public operatingSystem(): string | null {
-    return this._itemprop("operatingSystem") || null;
+    return this.sourceJSONLD.operatingSystem();
   }
-  
+
   public size(): string | null {
-    return getText(queryOne(this.dom, "AddonMoreInfo-filesize")) || null;
+    return this.sourceReduxStoreState.size() || this.sourceDOM.size();
   }
-  
+
   public lastUpdated(): string | null {
-    return getText(queryOne(this.dom, "AddonMoreInfo-last-updated")) || null;
+    return (
+      this.sourceReduxStoreState.lastUpdated() || this.sourceDOM.lastUpdated()
+    );
   }
+
+  /** @internal */
+  private _dom?: Node[];
 
   public get dom() {
     if (!this._dom) {
@@ -300,36 +195,44 @@ export class Amo {
     return this._dom;
   }
 
-  private _itemprop(property: string): string | null {
-    if (this._itempropMemo[property] === void 0) {
-      const itempropElem = findOne(
-        (elem) => elem.attribs.itemprop === property,
-        this.dom,
-      );
-
-      this._itempropMemo[property] =
-        itempropElem && itempropElem.attribs.content != null
-          ? itempropElem.attribs.content
-          : null;
+  /** @internal */
+  private _sourceDOM?: SourceDOM;
+  /** @internal */
+  public get sourceDOM(): SourceDOM {
+    if (!this._sourceDOM) {
+      this._sourceDOM = new SourceDOM(this.dom);
     }
-
-    return this._itempropMemo[property] ?? null;
+    return this._sourceDOM;
   }
 
-  private _og(property: string): string | null {
-    if (this._ogMemo[property] === void 0) {
-      const ogElem = findOne(
-        (elem) => elem.attribs.property === property,
-        this.dom,
-      );
-
-      this._ogMemo[property] =
-        ogElem && ogElem.attribs.content != null
-          ? ogElem.attribs.content
-          : null;
+  /** @internal */
+  private _sourceJSONLD?: SourceJSONLD;
+  /** @internal */
+  public get sourceJSONLD(): SourceJSONLD {
+    if (!this._sourceJSONLD) {
+      this._sourceJSONLD = new SourceJSONLD(this.dom);
     }
+    return this._sourceJSONLD;
+  }
 
-    return this._ogMemo[property];
+  /** @internal */
+  private _sourceOG?: SourceOG;
+  /** @internal */
+  public get sourceOG(): SourceOG {
+    if (!this._sourceOG) {
+      this._sourceOG = new SourceOG(this.dom);
+    }
+    return this._sourceOG;
+  }
+
+  /** @internal */
+  private _sourceReduxStoreState?: SourceReduxStoreState;
+  /** @internal */
+  public get sourceReduxStoreState(): SourceReduxStoreState {
+    if (!this._sourceReduxStoreState) {
+      this._sourceReduxStoreState = new SourceReduxStoreState(this.dom);
+    }
+    return this._sourceReduxStoreState;
   }
 }
 

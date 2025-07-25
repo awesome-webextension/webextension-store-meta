@@ -7,6 +7,7 @@
     "baseUrl": "src",
     "strict": true,
     "strictPropertyInitialization": false,
+    "stripInternal": true,
     "declaration": true,
     "sourceMap": true,
     "removeComments": false,
