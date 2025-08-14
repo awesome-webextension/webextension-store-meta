@@ -34,13 +34,11 @@ jobs:
       - name: Test 🧪
         run: npm run coverage
 
-      - name: Coveralls 🎉
-        uses: coverallsapp/github-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build Docs 📖
         run: npm run docs
+        
+      - name: Create Coverage Badge 🏷️
+        run: npx coverage-badge-svg
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4

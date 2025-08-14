@@ -6,7 +6,7 @@
 [![Docs](https://img.shields.io/badge/Docs-read-%23fdf9f5)](https://awesome-webextension.github.io/webextension-store-meta/)
 [![npm-version](https://img.shields.io/npm/v/webextension-store-meta.svg)](https://www.npmjs.com/package/webextension-store-meta)
 [![Build Status](https://github.com/awesome-webextension/webextension-store-meta/actions/workflows/build.yml/badge.svg)](https://github.com/awesome-webextension/webextension-store-meta/actions/workflows/build.yml)
-[![Coverage Status](https://img.shields.io/coveralls/github/awesome-webextension/webextension-store-meta/main)](https://coveralls.io/github/awesome-webextension/webextension-store-meta?branch=main)
+![Coverage Status](https://awesome-webextension.github.io/webextension-store-meta/coverage-badges/webextension-store-meta.svg)
 
 </div>
 
