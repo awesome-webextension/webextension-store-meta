@@ -88,6 +88,6 @@ Load config:
 ```bash
 git clone https://github.com/awesome-webextension/webextension-store-meta.git
 cd webextension-store-meta
-pnpm i
-pnpm test
+npm i
+npm test
 ```
