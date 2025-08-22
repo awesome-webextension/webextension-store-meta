@@ -1,4 +1,4 @@
-name: build
+name: build-node18
 on:
   push:
     branches:
@@ -14,7 +14,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 18
           cache: npm
 
       - name: Install dependencies 📦
@@ -30,14 +30,3 @@ jobs:
 
       - name: Test 🧪
         run: npm run coverage
-
-      - name: Build Docs 📖
-        run: npm run docs
-        
-      - name: Create Coverage Badge 🏷️
-        run: npx coverage-badge-svg
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: docs
