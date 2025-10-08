@@ -1,3 +1,8 @@
+## [1.2.9] - 2025-10-08
+
+### Fixed
+- Add null check for extension not found in ChromeWebStore.
+
 ## [1.2.8] - 2025-07-25
 
 ### Fixed
