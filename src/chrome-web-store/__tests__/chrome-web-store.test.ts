@@ -1,7 +1,7 @@
 import { fetch } from "undici";
-import { type MockedFunction, describe, expect, it, vi } from "vitest";
-import { ChromeWebStore } from "../";
+import { describe, expect, it, type MockedFunction, vi } from "vitest";
 import { fetchText } from "../../utils/fetch-text";
+import { ChromeWebStore } from "../";
 import { fixtures } from "./fixtures";
 
 const fetchTextMock = fetchText as MockedFunction<typeof fetchText>;
@@ -24,7 +24,7 @@ describe("Chrome Web Store", async () => {
   it("should extract og", async () => {
     const og = {
       type: "website",
-      url: "https://example.com/url",
+      url: "https://example.com/detail/url",
       title: "title",
       image: "https://example.com/image.jpg",
       description: "description",
@@ -34,6 +34,7 @@ describe("Chrome Web Store", async () => {
       <!DOCTYPE html>
       <html>
         <head>
+          <link rel="canonical" href="${og.url}"></link>
           ${Object.entries(og).map(
             ([property, value]) =>
               `<meta property="og:${property}" content="${value}"/>`,
@@ -103,4 +104,21 @@ describe("Chrome Web Store", async () => {
     },
     20000,
   );
+
+  it("should get null if extension not found", async () => {
+    const chromeWebStore = new ChromeWebStore({ id: "xxxx" });
+    await chromeWebStore.load();
+    expect(chromeWebStore.meta()).toMatchObject({
+      name: null,
+      description: null,
+      url: null,
+      image: null,
+      ratingValue: null,
+      ratingCount: null,
+      users: null,
+      version: null,
+      size: null,
+      lastUpdated: null,
+    });
+  });
 });

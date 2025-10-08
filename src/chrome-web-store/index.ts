@@ -1,8 +1,7 @@
-import type { RequestInit } from "undici";
-
 import { parse, stringify } from "node:querystring";
-import { DomHandler, type Node, isTag, isText } from "domhandler";
+import { DomHandler, isTag, isText, type Node } from "domhandler";
 import { Parser } from "htmlparser2/lib/Parser";
+import type { RequestInit } from "undici";
 import { findOne, getText, queryOne } from "../utils/dom";
 import { fetchText } from "../utils/fetch-text";
 import { parseVersion } from "../utils/parse";
@@ -67,7 +66,14 @@ export class ChromeWebStore {
 
     const handler = new DomHandler();
     new Parser(handler).end(html);
-    this._dom = handler.dom;
+
+    const href = findOne(
+      (el) => el.tagName === "link" && el.attribs.rel === "canonical",
+      handler.dom,
+    )?.attribs.href;
+
+    // Only keep DOM if it's an item page
+    this._dom = href?.includes("/detail/") ? handler.dom : [];
 
     return this;
   }
@@ -161,20 +167,20 @@ export class ChromeWebStore {
 
     return this._cache.get("version") ?? null;
   }
-  
+
   public size(): string | null {
     if (!this._cache.has("size")) {
       const el = queryOne(this.dom, "ZSMSLb");
-      this._cache.set("size", getText(el?.lastChild) || null)
+      this._cache.set("size", getText(el?.lastChild) || null);
     }
 
     return this._cache.get("size") ?? null;
   }
-  
+
   public lastUpdated(): string | null {
     if (!this._cache.has("lastUpdated")) {
       const el = queryOne(this.dom, "uBIrad");
-      this._cache.set("lastUpdated", getText(el?.lastChild) || null)
+      this._cache.set("lastUpdated", getText(el?.lastChild) || null);
     }
 
     return this._cache.get("lastUpdated") ?? null;

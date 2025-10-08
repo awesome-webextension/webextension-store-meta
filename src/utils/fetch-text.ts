@@ -1,4 +1,4 @@
-import { type RequestInit, fetch } from "undici";
+import { fetch, type RequestInit } from "undici";
 
 const DEFAULT_OPTIONS = {
   headers: {
