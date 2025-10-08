@@ -1,3 +1,8 @@
+## [1.2.10] - 2025-10-08
+
+### Updated
+- Down-grade deps to node18 compatible.
+
 ## [1.2.9] - 2025-10-08
 
 ### Fixed
