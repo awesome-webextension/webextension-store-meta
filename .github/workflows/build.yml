@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - main
-  schedule:
-    - cron: '0 0 * * *'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -33,7 +31,7 @@ jobs:
 
       - name: Build Docs 📖
         run: npm run docs
-        
+
       - name: Create Coverage Badge 🏷️
         run: npx coverage-badge-svg
 
