@@ -10,6 +10,8 @@ updates:
     versioning-strategy: "increase"
     schedule:
       interval: "monthly"
-    groups:
-      dev-deps:
-        dependency-type: "development"
+    allow:
+      - dependency-name: "@biomejs/biome"
+      - dependency-name: "typedoc"
+      - dependency-name: "typescript"
+      - dependency-name: "pretty-bytes"
