@@ -15,3 +15,8 @@ updates:
       - dependency-name: "typedoc"
       - dependency-name: "typescript"
       - dependency-name: "pretty-bytes"
+    groups:
+      typescript-tools:
+        patterns:
+          - "typescript"
+          - "typedoc"
