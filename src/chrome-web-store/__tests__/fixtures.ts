@@ -2,8 +2,7 @@ import { fetchText } from "../../utils/fetch-text";
 
 const IDs = [
   "cdonnmffkdaoajfknoeeecmchibpmkmg",
-  // https://github.com/awesome-webextension/webextension-store-meta/pull/3
-  "ekbmhggedfdlajiikminikhcjffbleac",
+  "lmjdlojahmbbcodnpecnjnmlddbkjhnn",
   // https://github.com/awesome-webextension/webextension-store-meta/pull/9
   "modkelfkcfjpgbfmnbnllalkiogfofhb",
 ];
