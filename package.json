@@ -51,8 +51,8 @@
     "@types/node": "^20.1.7",
     "@vitest/coverage-v8": "^1.5.0",
     "cheerio": "1.0.0",
-    "typedoc": "^0.28.17",
-    "typescript": "^5.9.3",
+    "typedoc": "^0.28.18",
+    "typescript": "^6.0.2",
     "vitest": "^1.5.0"
   },
   "dependencies": {
