@@ -1,3 +1,8 @@
+## [1.3.0] - 2026-05-18
+
+### Added
+- Add Microsoft Edge Add-ons support.
+
 ## [1.2.10] - 2025-10-08
 
 ### Updated
