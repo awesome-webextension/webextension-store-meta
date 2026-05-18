@@ -10,7 +10,7 @@
 
 </div>
 
-Get browser extension(webextension) item meta from Chrome Web Store and Firefox add-ons.
+Get browser extension(webextension) item meta from Chrome Web Store, Firefox add-ons, and Microsoft Edge Add-ons.
 
 This lib uses many fallback methods to improve stability and performance.
 
@@ -28,7 +28,7 @@ This lib uses many fallback methods to improve stability and performance.
     </tr>
     <tr>
       <th align="center">
-        <a href="https://shields.io/">Shields.io</a>
+        <a href="https://shields.io/badges/chrome-web-store-rating">Shields.io</a>
       </th>
       <th align="center">
         <a href="https://badgen.net/chrome-web-store">Badgen</a>
@@ -66,6 +66,13 @@ console.log(chromeWebStore.meta())
 const { Amo } = require('webextension-store-meta/lib/amo')
 const amo = await Amo.load({ id: 'xxxxxxx' })
 console.log(amo.meta())
+
+const { EdgeAddons } = require('webextension-store-meta/lib/edge-addons')
+const edgeAddons = await EdgeAddons.load({
+  id: 'xxxxxxx',
+  qs: { hl: 'en-US' },
+})
+console.log(edgeAddons.meta())
 ```
 
 Get individual property:

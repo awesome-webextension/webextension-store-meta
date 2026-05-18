@@ -1,7 +1,7 @@
 {
   "name": "webextension-store-meta",
   "version": "1.2.10",
-  "description": "Get browser extension(webextension) item meta from Chrome Web Store and Firefox add-ons.",
+  "description": "Get browser extension(webextension) item meta from Chrome Web Store, Firefox add-ons, and Microsoft Edge Add-ons.",
   "main": "lib/index.js",
   "directories": {
     "lib": "lib"
@@ -34,6 +34,8 @@
     "chrome-theme",
     "chrome-web-store",
     "firefox-addons",
+    "microsoft-edge-addons",
+    "edge-addons",
     "itemprop",
     "meta"
   ],
