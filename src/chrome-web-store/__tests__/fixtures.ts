@@ -3,8 +3,7 @@ import { fetchText } from "../../utils/fetch-text";
 const IDs = [
   "cdonnmffkdaoajfknoeeecmchibpmkmg",
   "lmjdlojahmbbcodnpecnjnmlddbkjhnn",
-  // https://github.com/awesome-webextension/webextension-store-meta/pull/9
-  "modkelfkcfjpgbfmnbnllalkiogfofhb",
+  "chphlpgkkbolifaimnlloiipkdnihall",
 ];
 
 export async function fixtures(): Promise<string[]> {
