@@ -11,8 +11,9 @@
     "build": "rm -rf lib && tsc",
     "ts-check": "tsc --noEmit",
     "test": "vitest",
+    "test:daily": "vitest run --config vitest.daily.config.mts",
     "docs": "typedoc --options typedoc.json",
-    "coverage": "vitest --coverage.enabled --coverage.reporter='json-summary' --coverage.reporter=text",
+    "coverage": "vitest --coverage.enabled",
     "lint": "biome lint src/**/* && tsc --noEmit"
   },
   "repository": {

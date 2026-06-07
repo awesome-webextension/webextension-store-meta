@@ -45,51 +45,6 @@ describe("Amo", async () => {
         const amo = new Amo({ id: extId });
         await amo.load();
         expect(amo.meta()).toMatchObject(matchAnyInfo);
-
-        expect(amo.sourceDOM.name()).toEqual(expect.any(String));
-        expect(amo.sourceDOM.description()).toEqual(expect.any(String));
-        expect(amo.sourceDOM.ratingValue()).toEqual(expect.any(Number));
-        expect(amo.sourceDOM.ratingCount()).toEqual(expect.any(Number));
-        expect(amo.sourceDOM.users()).toEqual(expect.any(Number));
-        expect(amo.sourceDOM.version()).toEqual(expect.any(String));
-        expect(amo.sourceDOM.url()).toEqual(expect.any(String));
-        expect(amo.sourceDOM.image()).toEqual(expect.any(String));
-        expect(amo.sourceDOM.size()).toEqual(expect.any(String));
-        expect(amo.sourceDOM.lastUpdated()).toEqual(expect.any(String));
-
-        expect(amo.sourceJSONLD.name()).toEqual(expect.any(String));
-        expect(amo.sourceJSONLD.description()).toEqual(expect.any(String));
-        expect(amo.sourceJSONLD.ratingValue()).toEqual(expect.any(Number));
-        expect(amo.sourceJSONLD.ratingCount()).toEqual(expect.any(Number));
-        expect(amo.sourceJSONLD.price()).toEqual(expect.any(Number));
-        expect(amo.sourceJSONLD.priceCurrency()).toEqual(expect.any(String));
-        expect(amo.sourceJSONLD.version()).toEqual(expect.any(String));
-        expect(amo.sourceJSONLD.url()).toEqual(expect.any(String));
-        expect(amo.sourceJSONLD.image()).toEqual(expect.any(String));
-        expect(amo.sourceJSONLD.operatingSystem()).toEqual(expect.any(String));
-
-        expect(amo.sourceReduxStoreState.name()).toEqual(expect.any(String));
-        expect(amo.sourceReduxStoreState.description()).toEqual(
-          expect.any(String),
-        );
-        expect(amo.sourceReduxStoreState.ratingValue()).toEqual(
-          expect.any(Number),
-        );
-        expect(amo.sourceReduxStoreState.ratingCount()).toEqual(
-          expect.any(Number),
-        );
-        expect(amo.sourceReduxStoreState.users()).toEqual(expect.any(Number));
-        expect(amo.sourceReduxStoreState.version()).toEqual(expect.any(String));
-        expect(amo.sourceReduxStoreState.url()).toEqual(expect.any(String));
-        expect(amo.sourceReduxStoreState.image()).toEqual(expect.any(String));
-        expect(amo.sourceReduxStoreState.size()).toEqual(expect.any(String));
-        expect(amo.sourceReduxStoreState.lastUpdated()).toEqual(
-          expect.any(String),
-        );
-
-        expect(amo.sourceOG.description()).toEqual(expect.any(String));
-        expect(amo.sourceOG.url()).toEqual(expect.any(String));
-        expect(amo.sourceOG.image()).toEqual(expect.any(String));
       });
 
       it("should also return ext info with static `load` shortcut", async () => {
@@ -131,7 +86,7 @@ describe("Amo", async () => {
           },
         );
 
-        const amo = await Amo.load({ id: "ublock-origin" });
+        const amo = await Amo.load({ id: "duckduckgo-for-firefox" });
         expect(amo.meta()).toMatchObject({
           name: expect.any(String),
           description: expect.any(String),

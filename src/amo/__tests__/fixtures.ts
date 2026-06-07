@@ -1,9 +1,9 @@
 import { fetch } from "undici";
 
-const IDs = ["ublock-origin", "duckduckgo-for-firefox"];
+const IDS = ["duckduckgo-for-firefox", "ext-saladict"];
 
 export async function fixtures(): Promise<string[]> {
-  const exts = new Set(IDs);
+  const exts = new Set(IDS);
 
   if (process.env.CI) {
     const idMatcher = /\/firefox\/addon\/([^/?]+)/g;

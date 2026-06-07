@@ -22,3 +22,7 @@ jobs:
 
       - name: Test 🧪
         run: npm run test
+
+      - name: Source health 🩺
+        if: ${{ matrix.node-version == 20 && !cancelled() }}
+        run: npm run test:daily
