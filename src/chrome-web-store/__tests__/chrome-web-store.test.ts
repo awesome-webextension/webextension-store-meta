@@ -2,7 +2,6 @@ import { fetch } from "undici";
 import { describe, expect, it, type MockedFunction, vi } from "vitest";
 import { fetchText } from "../../utils/fetch-text";
 import { ChromeWebStore } from "../";
-import { fixtures } from "./fixtures";
 
 const fetchTextMock = fetchText as MockedFunction<typeof fetchText>;
 
@@ -58,56 +57,43 @@ describe("Chrome Web Store", async () => {
     });
   });
 
-  const matchAnyInfo = {
-    name: expect.any(String),
-    description: expect.any(String),
-    ratingValue: expect.any(String),
-    ratingCount: expect.any(String),
-    users: expect.any(String),
-    version: expect.any(String),
-    url: expect.any(String),
-    image: expect.any(String),
-    size: expect.any(String),
-    lastUpdated: expect.any(String),
-  };
+  it("should concat querystring", async () => {
+    fetchTextMock.mockResolvedValueOnce(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <link rel="canonical" href="https://example.com/detail/url"></link>
+        </head>
+      </html>
+    `);
 
-  describe.each(await fixtures())(
-    "%s",
-    (id) => {
-      it("should return ext info", async () => {
-        const chromeWebStore = new ChromeWebStore({ id });
-        await chromeWebStore.load();
-        expect(chromeWebStore.meta()).toMatchObject(matchAnyInfo);
-      });
+    await ChromeWebStore.load({
+      id: "xxx",
+      qs: { hl: "zh", lr: "lang_zh-CN" },
+    });
 
-      it("should also return ext info with static `load` shortcut", async () => {
-        const chromeWebStore = await ChromeWebStore.load({ id });
-        expect(chromeWebStore.meta()).toMatchObject(matchAnyInfo);
-      });
+    expect(fetchTextMock).toHaveBeenLastCalledWith(
+      expect.stringContaining("?hl=zh&lr=lang_zh-CN"),
+      undefined,
+    );
+  });
 
-      it("should concat querystring", async () => {
-        const chromeWebStore = await ChromeWebStore.load({
-          id,
-          qs: { hl: "zh", lr: "lang_zh-CN" },
-        });
-        expect(chromeWebStore.meta()).toMatchObject(matchAnyInfo);
-        expect(fetchTextMock).toHaveBeenLastCalledWith(
-          expect.stringContaining("?hl=zh&lr=lang_zh-CN"),
-          undefined,
-        );
-      });
-
-      it("should throw error if document is not loaded", () => {
-        const chromeWebStore = new ChromeWebStore({ id });
-        expect(() => chromeWebStore.meta()).toThrow();
-      });
-    },
-    20000,
-  );
+  it("should throw error if document is not loaded", () => {
+    const chromeWebStore = new ChromeWebStore({ id: "xxx" });
+    expect(() => chromeWebStore.meta()).toThrow();
+  });
 
   it("should get null if extension not found", async () => {
-    const chromeWebStore = new ChromeWebStore({ id: "xxxx" });
-    await chromeWebStore.load();
+    fetchTextMock.mockResolvedValueOnce(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <link rel="canonical" href="https://example.com/not-found"></link>
+        </head>
+      </html>
+    `);
+
+    const chromeWebStore = await ChromeWebStore.load({ id: "xxxx" });
     expect(chromeWebStore.meta()).toMatchObject({
       name: null,
       description: null,

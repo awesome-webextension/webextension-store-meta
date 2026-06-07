@@ -1,9 +1,10 @@
-name: build
+name: Daily Store Health
 on:
   schedule:
     - cron: "0 0 * * *"
 jobs:
-  build-and-deploy:
+  store-health:
+    name: Store health
     runs-on: ubuntu-latest
     strategy:
       matrix:

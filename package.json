@@ -13,7 +13,7 @@
     "test": "vitest",
     "test:daily": "vitest run --config vitest.daily.config.mts",
     "docs": "typedoc --options typedoc.json",
-    "coverage": "vitest --coverage.enabled",
+    "coverage": "vitest run --coverage.enabled",
     "lint": "biome lint src/**/* && tsc --noEmit"
   },
   "repository": {

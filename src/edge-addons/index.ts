@@ -2,61 +2,17 @@ import { parse, stringify } from "node:querystring";
 import { DomHandler, type Node } from "domhandler";
 import { Parser } from "htmlparser2/lib/Parser";
 import type { RequestInit } from "undici";
-import { findOne, getText } from "../utils/dom";
 import { fetchText } from "../utils/fetch-text";
-import { isPlainObject } from "../utils/parse";
+import { SourceAPI, type EdgeAddonsApiData } from "./SourceAPI";
+import { SourceDOM } from "./SourceDOM";
+import type {
+  EdgeAddonsImage,
+  EdgeAddonsMeta,
+  EdgeAddonsPrivacyData,
+} from "./types";
 
 export type { RequestInit };
-
-export interface EdgeAddonsImage {
-  caption?: string;
-  imagePurpose?: string;
-  uri?: string;
-  [key: string]: unknown;
-}
-
-export interface EdgeAddonsPrivacyData {
-  privacyPolicyRequired?: boolean;
-  dataUsageList?: unknown[];
-  disclosureList?: unknown[];
-  [key: string]: unknown;
-}
-
-export interface EdgeAddonsMeta {
-  availability: string[] | null;
-  activeInstallCount: number | null;
-  storeProductId: string | null;
-  name: string | null;
-  logoUrl: string | null;
-  thumbnailUrl: string | null;
-  description: string | null;
-  developer: string | null;
-  category: string | null;
-  isInstalled: boolean | null;
-  crxId: string | null;
-  manifest: string | null;
-  isHavingMatureContent: boolean | null;
-  version: string | null;
-  lastUpdateDate: number | null;
-  privacyUrl: string | null;
-  availabilityId: string | null;
-  skuId: string | null;
-  locale: string | null;
-  market: string | null;
-  averageRating: number | null;
-  ratingCount: number | null;
-  availableLanguages: string[] | null;
-  metadata: Record<string, unknown> | null;
-  shortDescription: string | null;
-  searchKeywords: string | null;
-  screenshots: EdgeAddonsImage[] | null;
-  videos: EdgeAddonsImage[] | null;
-  largePromotionImage: EdgeAddonsImage | null;
-  publisherWebsiteUri: string | null;
-  isBadgedAsFeatured: boolean | null;
-  privacyData: EdgeAddonsPrivacyData | null;
-  url: string | null;
-}
+export type { EdgeAddonsImage, EdgeAddonsMeta, EdgeAddonsPrivacyData };
 
 export interface EdgeAddonsOptions {
   /**
@@ -75,13 +31,6 @@ export interface EdgeAddonsOptions {
   qs?: Record<string, string> | string;
 }
 
-type EdgeAddonsApiData = Partial<
-  Omit<EdgeAddonsMeta, "url" | "logoUrl" | "thumbnailUrl">
-> & {
-  logoUrl?: string | null;
-  thumbnailUrl?: string | null;
-};
-
 export class EdgeAddons {
   public id: string;
   public options?: RequestInit;
@@ -90,7 +39,6 @@ export class EdgeAddons {
   private _data: EdgeAddonsApiData | null = null;
   private _dom: Node[] | null = null;
   private _url: string | null = null;
-  private _cache = new Map<keyof EdgeAddonsMeta, unknown>();
 
   public constructor({ id, options, qs }: EdgeAddonsOptions) {
     this.id = id;
@@ -176,147 +124,138 @@ export class EdgeAddons {
   }
 
   public availability(): string[] | null {
-    return this._array("availability");
+    return this.sourceAPI.availability();
   }
 
   public activeInstallCount(): number | null {
-    return this._number("activeInstallCount", () =>
-      this._parseMetaNumber("userInteractionCount"),
+    return (
+      this.sourceAPI.activeInstallCount() ??
+      this.sourceDOM.activeInstallCount()
     );
   }
 
   public storeProductId(): string | null {
-    return this._string("storeProductId");
+    return this.sourceAPI.storeProductId();
   }
 
   public name(): string | null {
-    return this._string("name", () => this._title());
+    return this.sourceAPI.name() || this.sourceDOM.name();
   }
 
   public logoUrl(): string | null {
-    return this._urlString("logoUrl");
+    return this.sourceAPI.logoUrl();
   }
 
   public thumbnailUrl(): string | null {
-    return this._urlString("thumbnailUrl");
+    return this.sourceAPI.thumbnailUrl();
   }
 
   public description(): string | null {
-    return this._string("description");
+    return this.sourceAPI.description();
   }
 
   public developer(): string | null {
-    return this._string("developer");
+    return this.sourceAPI.developer();
   }
 
   public category(): string | null {
-    return this._string("category");
+    return this.sourceAPI.category();
   }
 
   public isInstalled(): boolean | null {
-    return this._boolean("isInstalled");
+    return this.sourceAPI.isInstalled();
   }
 
   public crxId(): string | null {
-    return this._string("crxId");
+    return this.sourceAPI.crxId();
   }
 
   public manifest(): string | null {
-    return this._string("manifest");
+    return this.sourceAPI.manifest();
   }
 
   public isHavingMatureContent(): boolean | null {
-    return this._boolean("isHavingMatureContent");
+    return this.sourceAPI.isHavingMatureContent();
   }
 
   public version(): string | null {
-    return this._string("version");
+    return this.sourceAPI.version();
   }
 
   public lastUpdateDate(): number | null {
-    return this._number("lastUpdateDate");
+    return this.sourceAPI.lastUpdateDate();
   }
 
   public privacyUrl(): string | null {
-    return this._string("privacyUrl");
+    return this.sourceAPI.privacyUrl();
   }
 
   public availabilityId(): string | null {
-    return this._string("availabilityId");
+    return this.sourceAPI.availabilityId();
   }
 
   public skuId(): string | null {
-    return this._string("skuId");
+    return this.sourceAPI.skuId();
   }
 
   public locale(): string | null {
-    return this._string("locale");
+    return this.sourceAPI.locale();
   }
 
   public market(): string | null {
-    return this._string("market");
+    return this.sourceAPI.market();
   }
 
   public averageRating(): number | null {
-    return this._number("averageRating", () =>
-      this._parseMetaNumber("ratingValue"),
-    );
+    return this.sourceAPI.averageRating() ?? this.sourceDOM.averageRating();
   }
 
   public ratingCount(): number | null {
-    return this._number("ratingCount", () =>
-      this._parseMetaNumber("ratingCount"),
-    );
+    return this.sourceAPI.ratingCount() ?? this.sourceDOM.ratingCount();
   }
 
   public availableLanguages(): string[] | null {
-    return this._array("availableLanguages");
+    return this.sourceAPI.availableLanguages();
   }
 
   public metadata(): Record<string, unknown> | null {
-    return this._object("metadata");
+    return this.sourceAPI.metadata();
   }
 
   public shortDescription(): string | null {
-    return this._string("shortDescription");
+    return this.sourceAPI.shortDescription();
   }
 
   public searchKeywords(): string | null {
-    return this._string("searchKeywords");
+    return this.sourceAPI.searchKeywords();
   }
 
   public screenshots(): EdgeAddonsImage[] | null {
-    return this._images("screenshots");
+    return this.sourceAPI.screenshots();
   }
 
   public videos(): EdgeAddonsImage[] | null {
-    return this._images("videos");
+    return this.sourceAPI.videos();
   }
 
   public largePromotionImage(): EdgeAddonsImage | null {
-    const value = this._value("largePromotionImage");
-    if (!isPlainObject(value)) return null;
-    return normalizeImage(value);
+    return this.sourceAPI.largePromotionImage();
   }
 
   public publisherWebsiteUri(): string | null {
-    return this._string("publisherWebsiteUri");
+    return this.sourceAPI.publisherWebsiteUri();
   }
 
   public isBadgedAsFeatured(): boolean | null {
-    return this._boolean("isBadgedAsFeatured");
+    return this.sourceAPI.isBadgedAsFeatured();
   }
 
   public privacyData(): EdgeAddonsPrivacyData | null {
-    return this._object("privacyData") as EdgeAddonsPrivacyData | null;
+    return this.sourceAPI.privacyData();
   }
 
   public url(): string | null {
-    if (!this._cache.has("url")) {
-      this._cache.set("url", this._url);
-    }
-
-    return (this._cache.get("url") as string | null) ?? null;
+    return this.sourceDOM.url();
   }
 
   private get queryString(): string {
@@ -327,124 +266,30 @@ export class EdgeAddons {
     return `https://microsoftedge.microsoft.com/addons/detail/${this.id}`;
   }
 
-  private _value(key: keyof EdgeAddonsMeta): unknown {
+  /** @internal */
+  private _sourceAPI?: SourceAPI;
+  /** @internal */
+  public get sourceAPI(): SourceAPI {
     if (!this._data) {
       throw new Error(
         "Item not loaded. Please run `await instance.load()` first.`",
       );
     }
 
-    return this._data[key as keyof EdgeAddonsApiData] ?? null;
-  }
-
-  private _string(
-    key: keyof EdgeAddonsMeta,
-    fallback?: () => string | null,
-  ): string | null {
-    if (!this._cache.has(key)) {
-      const value = this._value(key);
-      this._cache.set(
-        key,
-        typeof value === "string" && value !== ""
-          ? value
-          : (fallback?.() ?? null),
-      );
+    if (!this._sourceAPI) {
+      this._sourceAPI = new SourceAPI(this._data);
     }
-
-    return (this._cache.get(key) as string | null) ?? null;
+    return this._sourceAPI;
   }
 
-  private _urlString(key: "logoUrl" | "thumbnailUrl"): string | null {
-    if (!this._cache.has(key)) {
-      const value = this._value(key);
-      this._cache.set(
-        key,
-        typeof value === "string" && value !== "" ? normalizeUrl(value) : null,
-      );
+  /** @internal */
+  private _sourceDOM?: SourceDOM;
+  /** @internal */
+  public get sourceDOM(): SourceDOM {
+    if (!this._sourceDOM) {
+      this._sourceDOM = new SourceDOM(this.dom, this._url);
     }
-
-    return (this._cache.get(key) as string | null) ?? null;
-  }
-
-  private _number(
-    key: keyof EdgeAddonsMeta,
-    fallback?: () => number | null,
-  ): number | null {
-    if (!this._cache.has(key)) {
-      const value = this._value(key);
-      this._cache.set(
-        key,
-        typeof value === "number" ? value : (fallback?.() ?? null),
-      );
-    }
-
-    return (this._cache.get(key) as number | null) ?? null;
-  }
-
-  private _boolean(key: keyof EdgeAddonsMeta): boolean | null {
-    if (!this._cache.has(key)) {
-      const value = this._value(key);
-      this._cache.set(key, typeof value === "boolean" ? value : null);
-    }
-
-    return (this._cache.get(key) as boolean | null) ?? null;
-  }
-
-  private _array(key: keyof EdgeAddonsMeta): string[] | null {
-    if (!this._cache.has(key)) {
-      const value = this._value(key);
-      this._cache.set(
-        key,
-        Array.isArray(value) && value.every((item) => typeof item === "string")
-          ? value
-          : null,
-      );
-    }
-
-    return (this._cache.get(key) as string[] | null) ?? null;
-  }
-
-  private _images(key: "screenshots" | "videos"): EdgeAddonsImage[] | null {
-    if (!this._cache.has(key)) {
-      const value = this._value(key);
-      this._cache.set(
-        key,
-        Array.isArray(value)
-          ? value.filter(isPlainObject).map(normalizeImage)
-          : null,
-      );
-    }
-
-    return (this._cache.get(key) as EdgeAddonsImage[] | null) ?? null;
-  }
-
-  private _object(key: keyof EdgeAddonsMeta): Record<string, unknown> | null {
-    if (!this._cache.has(key)) {
-      const value = this._value(key);
-      this._cache.set(key, isPlainObject(value) ? value : null);
-    }
-
-    return (this._cache.get(key) as Record<string, unknown> | null) ?? null;
-  }
-
-  private _title(): string | null {
-    const title = getText(findOne((el) => el.name === "title", this.dom));
-
-    return title.replace(/\s*-\s*Microsoft Edge Add-ons\s*$/, "") || null;
-  }
-
-  private _parseMetaNumber(itemprop: string): number | null {
-    const value = findOne(
-      (el) =>
-        el.name === "meta" &&
-        el.attribs.itemprop?.toLowerCase() === itemprop.toLowerCase(),
-      this.dom,
-    )?.attribs.content;
-
-    if (!value) return null;
-
-    const number = Number(value.replace(/,/g, ""));
-    return Number.isNaN(number) ? null : number;
+    return this._sourceDOM;
   }
 
   private get dom() {
@@ -458,15 +303,3 @@ export class EdgeAddons {
 }
 
 export default EdgeAddons;
-
-function normalizeUrl(url: string): string {
-  return url.startsWith("//") ? `https:${url}` : url;
-}
-
-function normalizeImage(image: Record<string, unknown>): EdgeAddonsImage {
-  const result: EdgeAddonsImage = { ...image };
-  if (typeof image.uri === "string") {
-    result.uri = normalizeUrl(image.uri);
-  }
-  return result;
-}

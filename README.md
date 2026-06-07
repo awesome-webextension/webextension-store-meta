@@ -5,6 +5,7 @@
 
 [![Docs](https://img.shields.io/badge/Docs-read-%23fdf9f5)](https://awesome-webextension.github.io/webextension-store-meta/)
 [![npm-version](https://img.shields.io/npm/v/webextension-store-meta.svg)](https://www.npmjs.com/package/webextension-store-meta)
+[![Daily Store Health](https://github.com/awesome-webextension/webextension-store-meta/actions/workflows/daily.yml/badge.svg)](https://github.com/awesome-webextension/webextension-store-meta/actions/workflows/daily.yml)
 [![Build Status](https://github.com/awesome-webextension/webextension-store-meta/actions/workflows/build.yml/badge.svg)](https://github.com/awesome-webextension/webextension-store-meta/actions/workflows/build.yml)
 ![Coverage Status](https://awesome-webextension.github.io/webextension-store-meta/coverage-badges/webextension-store-meta.svg)
 
@@ -13,6 +14,9 @@
 Get browser extension(webextension) item meta from Chrome Web Store, Firefox add-ons, and Microsoft Edge Add-ons.
 
 This lib uses many fallback methods to improve stability and performance.
+The fallback sources are checked every day against the real Chrome Web Store,
+Firefox Add-ons, and Microsoft Edge Add-ons pages, so upstream store changes are
+caught quickly instead of silently breaking metadata extraction.
 
 ## Who Use It
 
