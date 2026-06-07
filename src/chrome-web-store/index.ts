@@ -254,9 +254,7 @@ function parseRating(
   return null;
 }
 
-function parseVersionFromManifest(maybeNode: Node | Node[]): string | null {
-  const nodes = Array.isArray(maybeNode) ? maybeNode : [maybeNode];
-
+function parseVersionFromManifest(nodes: Node[]): string | null {
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i];
     if (!isTag(node)) {
