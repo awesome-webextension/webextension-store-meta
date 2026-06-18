@@ -10,6 +10,7 @@ import {
 } from "vitest";
 import { fetchText } from "../../utils/fetch-text";
 import { Amo, type AmoOptions } from "../";
+import { SourceAPI } from "../SourceAPI";
 import { SourceDOM } from "../SourceDOM";
 import { SourceJSONLD } from "../SourceJSONLD";
 import { SourceOG } from "../SourceOG";
@@ -26,6 +27,40 @@ const parseDOM = (html: string) => {
   const handler = new DomHandler();
   new Parser(handler).end(html);
   return handler.dom;
+};
+
+const API_DATA = {
+  average_daily_users: "6,789",
+  current_version: {
+    file: {
+      created: "2024-03-01T00:00:00Z",
+      size: 1_000_000,
+    },
+    version: "v9.8.7",
+  },
+  default_locale: "en-US",
+  description: {
+    "en-US": "API long description",
+    "zh-CN": "API long description zh",
+  },
+  icon_url: "https://example.com/api-icon.png",
+  last_updated: "2024-03-02T00:00:00Z",
+  name: {
+    "en-US": "API Add-on",
+    "zh-CN": "API Add-on zh",
+  },
+  previews: [
+    {},
+    {
+      image_url: "https://example.com/api.png",
+    },
+  ],
+  ratings: { average: "4.6", count: "42" },
+  summary: {
+    "en-US": "API summary",
+    "zh-CN": "API summary zh",
+  },
+  url: "https://addons.mozilla.org/firefox/addon/api-addon/",
 };
 
 const REDUX_HTML = `
@@ -127,32 +162,39 @@ describe("Amo", () => {
     fetchTextMock.mockReset();
   });
 
-  it("loads full meta from Redux state and JSON-LD", async () => {
+  it("loads API source first and falls back to JSON-LD for remaining fields", async () => {
     const options = { headers: { "User-Agent": "Test" } };
-    fetchTextMock.mockResolvedValueOnce(REDUX_HTML);
+    fetchTextMock
+      .mockResolvedValueOnce(JSON.stringify(API_DATA))
+      .mockResolvedValueOnce(REDUX_HTML);
 
     const amo = new Amo({ id: "redux-addon", options });
     await amo.load();
 
     expect(fetchTextMock).toHaveBeenCalledWith(
+      "https://addons.mozilla.org/api/v5/addons/addon/redux-addon/",
+      options,
+    );
+    expect(fetchTextMock).toHaveBeenCalledWith(
       "https://addons.mozilla.org/firefox/addon/redux-addon",
       options,
     );
     expect(amo.meta()).toMatchObject({
-      name: "Redux Add-on",
-      description: "Redux description",
-      ratingValue: 4.8,
-      ratingCount: 1234,
-      users: 12345,
+      name: "API Add-on",
+      description: "API summary",
+      ratingValue: 4.6,
+      ratingCount: 42,
+      users: 6789,
       price: 0,
       priceCurrency: "USD",
-      version: "1.2.3",
-      url: "https://addons.mozilla.org/firefox/addon/redux-addon/",
-      image: "https://example.com/redux.png",
+      version: "9.8.7",
+      url: "https://addons.mozilla.org/firefox/addon/api-addon/",
+      image: "https://example.com/api.png",
       operatingSystem: "Firefox",
       size: expect.any(String),
-      lastUpdated: "2024-01-01",
+      lastUpdated: "2024-03-02T00:00:00Z",
     });
+    expect(amo.sourceAPI).toBe(amo.sourceAPI);
     expect(amo.sourceDOM).toBe(amo.sourceDOM);
     expect(amo.sourceJSONLD).toBe(amo.sourceJSONLD);
     expect(amo.sourceOG).toBe(amo.sourceOG);
@@ -160,7 +202,7 @@ describe("Amo", () => {
   });
 
   it("also loads with static shortcut, locale, and querystring", async () => {
-    fetchTextMock.mockResolvedValueOnce(DOM_HTML);
+    fetchTextMock.mockResolvedValueOnce("{}").mockResolvedValueOnce(DOM_HTML);
 
     const amo = await Amo.load({
       id: "dom-addon",
@@ -180,6 +222,10 @@ describe("Amo", () => {
       size: "2 MB",
       lastUpdated: "2024-02-01",
     });
+    expect(fetchTextMock).toHaveBeenCalledWith(
+      "https://addons.mozilla.org/api/v5/addons/addon/dom-addon/?lang=zh-CN",
+      undefined,
+    );
     expect(fetchTextMock).toHaveBeenLastCalledWith(
       "https://addons.mozilla.org/zh-CN/firefox/addon/dom-addon?utm=test",
       undefined,
@@ -187,7 +233,7 @@ describe("Amo", () => {
   });
 
   it("serializes object querystrings", async () => {
-    fetchTextMock.mockResolvedValueOnce(DOM_HTML);
+    fetchTextMock.mockResolvedValueOnce("{}").mockResolvedValueOnce(DOM_HTML);
 
     await Amo.load({
       id: "dom-addon",
@@ -212,7 +258,9 @@ describe("Amo", () => {
   });
 
   it("falls back to JSON-LD source", async () => {
-    fetchTextMock.mockResolvedValueOnce(JSON_LD_HTML);
+    fetchTextMock
+      .mockResolvedValueOnce("{}")
+      .mockResolvedValueOnce(JSON_LD_HTML);
 
     const amo = await Amo.load({ id: "json-ld-addon" });
 
@@ -231,7 +279,7 @@ describe("Amo", () => {
   });
 
   it("falls back to Open Graph source for supported fields", async () => {
-    fetchTextMock.mockResolvedValueOnce(OG_HTML);
+    fetchTextMock.mockResolvedValueOnce("{}").mockResolvedValueOnce(OG_HTML);
 
     const amo = await Amo.load({ id: "og-addon" });
 
@@ -239,9 +287,70 @@ describe("Amo", () => {
     expect(amo.url()).toBe("https://example.com/og");
     expect(amo.image()).toBe("https://example.com/og.png");
   });
+
+  it("falls back to page sources when the API request fails", async () => {
+    fetchTextMock
+      .mockRejectedValueOnce(new Error("API down"))
+      .mockResolvedValueOnce(DOM_HTML);
+
+    const amo = await Amo.load({ id: "dom-addon" });
+
+    expect(amo.name()).toBe("DOM Add-on");
+    expect(amo.sourceAPI.name()).toBeNull();
+    expect(fetchTextMock).toHaveBeenLastCalledWith(
+      "https://addons.mozilla.org/firefox/addon/dom-addon",
+      undefined,
+    );
+  });
 });
 
 describe("AMO sources", () => {
+  it("reads AMO v5 API fields", () => {
+    const source = new SourceAPI(API_DATA, "zh-CN");
+
+    expect(source.name()).toBe("API Add-on zh");
+    expect(source.description()).toBe("API summary zh");
+    expect(source.ratingValue()).toBe(4.6);
+    expect(source.ratingCount()).toBe(42);
+    expect(source.users()).toBe(6789);
+    expect(source.version()).toBe("9.8.7");
+    expect(source.url()).toBe(
+      "https://addons.mozilla.org/firefox/addon/api-addon/",
+    );
+    expect(source.image()).toBe("https://example.com/api.png");
+    expect(source.size()).toBe("1 MB");
+    expect(source.lastUpdated()).toBe("2024-03-02T00:00:00Z");
+  });
+
+  it("falls back through AMO v5 API translations", () => {
+    expect(new SourceAPI(API_DATA, "fr").name()).toBe("API Add-on");
+    expect(
+      new SourceAPI({
+        default_locale: "fr",
+        name: { "en-US": "English name", fr: null },
+      }).name(),
+    ).toBe("English name");
+  });
+
+  it("returns nulls from incomplete AMO v5 API data", () => {
+    const source = new SourceAPI({
+      current_version: { file: { size: 0 } },
+      previews: [{}],
+      ratings: { average: 6, count: "bad" },
+    });
+
+    expect(source.name()).toBeNull();
+    expect(source.description()).toBeNull();
+    expect(source.ratingValue()).toBeNull();
+    expect(source.ratingCount()).toBeNull();
+    expect(source.users()).toBeNull();
+    expect(source.version()).toBeNull();
+    expect(source.url()).toBeNull();
+    expect(source.image()).toBeNull();
+    expect(source.size()).toBeNull();
+    expect(source.lastUpdated()).toBeNull();
+  });
+
   it("returns nulls from empty DOM source", () => {
     const source = new SourceDOM(parseDOM(""));
 

@@ -3,6 +3,7 @@ import { DomHandler, type Node } from "domhandler";
 import { Parser } from "htmlparser2/lib/Parser";
 import type { RequestInit } from "undici";
 import { fetchText } from "../utils/fetch-text";
+import { type AmoApiData, SourceAPI } from "./SourceAPI";
 import { SourceDOM } from "./SourceDOM";
 import { SourceJSONLD } from "./SourceJSONLD";
 import { SourceOG } from "./SourceOG";
@@ -59,6 +60,14 @@ export class Amo {
   }
 
   public async load(): Promise<Amo> {
+    try {
+      this._apiData = JSON.parse(
+        await fetchText(this.apiUrl, this.config.options),
+      );
+    } catch (_) {
+      this._apiData = {};
+    }
+
     let qs = this.config.qs
       ? typeof this.config.qs === "string"
         ? this.config.qs
@@ -100,6 +109,7 @@ export class Amo {
 
   public name(): string | null {
     return (
+      this.sourceAPI.name() ||
       this.sourceReduxStoreState.name() ||
       this.sourceJSONLD.name() ||
       this.sourceDOM.name()
@@ -108,6 +118,7 @@ export class Amo {
 
   public description(): string | null {
     return (
+      this.sourceAPI.description() ||
       this.sourceReduxStoreState.description() ||
       this.sourceJSONLD.description() ||
       this.sourceOG.description() ||
@@ -117,22 +128,28 @@ export class Amo {
 
   public ratingValue(): number | null {
     return (
-      this.sourceReduxStoreState.ratingValue() ||
-      this.sourceJSONLD.ratingValue() ||
+      this.sourceAPI.ratingValue() ??
+      this.sourceReduxStoreState.ratingValue() ??
+      this.sourceJSONLD.ratingValue() ??
       this.sourceDOM.ratingValue()
     );
   }
 
   public ratingCount(): number | null {
     return (
-      this.sourceReduxStoreState.ratingCount() ||
-      this.sourceJSONLD.ratingCount() ||
+      this.sourceAPI.ratingCount() ??
+      this.sourceReduxStoreState.ratingCount() ??
+      this.sourceJSONLD.ratingCount() ??
       this.sourceDOM.ratingCount()
     );
   }
 
   public users(): number | null {
-    return this.sourceReduxStoreState.users() || this.sourceDOM.users();
+    return (
+      this.sourceAPI.users() ??
+      this.sourceReduxStoreState.users() ??
+      this.sourceDOM.users()
+    );
   }
 
   public price(): number | null {
@@ -145,6 +162,7 @@ export class Amo {
 
   public version(): string | null {
     return (
+      this.sourceAPI.version() ||
       this.sourceReduxStoreState.version() ||
       this.sourceJSONLD.version() ||
       this.sourceDOM.version()
@@ -153,6 +171,7 @@ export class Amo {
 
   public url(): string | null {
     return (
+      this.sourceAPI.url() ||
       this.sourceReduxStoreState.url() ||
       this.sourceJSONLD.url() ||
       this.sourceOG.url() ||
@@ -162,6 +181,7 @@ export class Amo {
 
   public image(): string | null {
     return (
+      this.sourceAPI.image() ||
       this.sourceReduxStoreState.image() ||
       this.sourceJSONLD.image() ||
       this.sourceOG.image() ||
@@ -174,13 +194,47 @@ export class Amo {
   }
 
   public size(): string | null {
-    return this.sourceReduxStoreState.size() || this.sourceDOM.size();
+    return (
+      this.sourceAPI.size() ||
+      this.sourceReduxStoreState.size() ||
+      this.sourceDOM.size()
+    );
   }
 
   public lastUpdated(): string | null {
     return (
-      this.sourceReduxStoreState.lastUpdated() || this.sourceDOM.lastUpdated()
+      this.sourceAPI.lastUpdated() ||
+      this.sourceReduxStoreState.lastUpdated() ||
+      this.sourceDOM.lastUpdated()
     );
+  }
+
+  private get apiUrl(): string {
+    const qs = this.config.locale
+      ? `?${stringify({ lang: this.config.locale })}`
+      : "";
+    return `https://addons.mozilla.org/api/v5/addons/addon/${encodeURIComponent(
+      this.config.id,
+    )}/${qs}`;
+  }
+
+  /** @internal */
+  private _apiData?: AmoApiData;
+
+  /** @internal */
+  private _sourceAPI?: SourceAPI;
+  /** @internal */
+  public get sourceAPI(): SourceAPI {
+    if (!this._apiData) {
+      throw new Error(
+        "Item not loaded. Please run `await instance.load()` first.`",
+      );
+    }
+
+    if (!this._sourceAPI) {
+      this._sourceAPI = new SourceAPI(this._apiData, this.config.locale);
+    }
+    return this._sourceAPI;
   }
 
   /** @internal */
