@@ -62,14 +62,14 @@ describe("Chrome Web Store", () => {
       description: "Extension description",
       url: DETAIL_URL,
       image: "https://example.com/image.png",
-      ratingValue: "4.7",
-      ratingCount: "321",
-      users: "12,345",
+      ratingValue: 4.7,
+      ratingCount: 321,
+      users: 12345,
       version: "1.2.3",
       size: "10 MB",
       lastUpdated: "2024-01-01",
     });
-    expect(chromeWebStore.users()).toBe("12,345");
+    expect(chromeWebStore.users()).toBe(12345);
     expect(chromeWebStore.version()).toBe("1.2.3");
   });
 
@@ -221,7 +221,7 @@ describe("Chrome Web Store", () => {
     expect(invalidRating.ratingValue()).toBeNull();
     expect(invalidRating.ratingCount()).toBeNull();
     expect(countOnly.ratingValue()).toBeNull();
-    expect(countOnly.ratingCount()).toBe("45");
+    expect(countOnly.ratingCount()).toBe(45);
     expect(missingCanonical.meta()).toMatchObject({
       url: null,
       ratingValue: null,

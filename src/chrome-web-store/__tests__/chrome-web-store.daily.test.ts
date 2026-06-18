@@ -6,9 +6,9 @@ describe("Chrome Web Store health", async () => {
   const matchAnyInfo = {
     name: expect.any(String),
     description: expect.any(String),
-    ratingValue: expect.any(String),
-    ratingCount: expect.any(String),
-    users: expect.any(String),
+    ratingValue: expect.any(Number),
+    ratingCount: expect.any(Number),
+    users: expect.any(Number),
     version: expect.any(String),
     url: expect.any(String),
     image: expect.any(String),

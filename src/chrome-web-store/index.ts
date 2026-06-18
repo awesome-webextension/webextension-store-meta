@@ -4,7 +4,7 @@ import { Parser } from "htmlparser2/lib/Parser";
 import type { RequestInit } from "undici";
 import { findOne, getText, queryOne } from "../utils/dom";
 import { fetchText } from "../utils/fetch-text";
-import { parseVersion } from "../utils/parse";
+import { parseNum, parseVersion } from "../utils/parse";
 
 export type { RequestInit };
 
@@ -13,9 +13,9 @@ export interface ChromeWebStoreMeta {
   description: string | null;
   url: string | null;
   image: string | null;
-  ratingValue: string | null;
-  ratingCount: string | null;
-  users: string | null;
+  ratingValue: number | null;
+  ratingCount: number | null;
+  users: number | null;
   version: string | null;
   size: string | null;
   lastUpdated: string | null;
@@ -124,15 +124,15 @@ export class ChromeWebStore {
     return this._og("og:image");
   }
 
-  public ratingValue(): string | null {
+  public ratingValue(): number | null {
     return this._parseRating("ratingValue");
   }
 
-  public ratingCount(): string | null {
+  public ratingCount(): number | null {
     return this._parseRating("ratingCount");
   }
 
-  public users(): string | null {
+  public users(): number | null {
     if (!this._cache.has("users")) {
       const container = queryOne(this.dom, "F9iKBc");
       if (container) {
@@ -153,7 +153,7 @@ export class ChromeWebStore {
       }
     }
 
-    return this._cache.get("users") ?? null;
+    return parseNum(this._cache.get("users"));
   }
 
   public version(): string | null {
@@ -211,14 +211,14 @@ export class ChromeWebStore {
     return this._cache.get(property) ?? null;
   }
 
-  private _parseRating(key: "ratingValue" | "ratingCount"): string | null {
+  private _parseRating(key: "ratingValue" | "ratingCount"): number | null {
     if (!this._cache.has(key)) {
       const result = parseRating(this.dom);
       this._cache.set("ratingValue", result?.ratingValue ?? null);
       this._cache.set("ratingCount", result?.ratingCount ?? null);
     }
 
-    return this._cache.get(key) ?? null;
+    return parseNum(this._cache.get(key));
   }
 }
 
