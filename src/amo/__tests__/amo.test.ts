@@ -14,7 +14,6 @@ import { SourceAPI } from "../SourceAPI";
 import { SourceDOM } from "../SourceDOM";
 import { SourceJSONLD } from "../SourceJSONLD";
 import { SourceOG } from "../SourceOG";
-import { SourceReduxStoreState } from "../SourceReduxStoreState";
 import { parseRattingValue } from "../utils";
 
 vi.mock("../../utils/fetch-text", () => ({
@@ -63,38 +62,10 @@ const API_DATA = {
   url: "https://addons.mozilla.org/firefox/addon/api-addon/",
 };
 
-const REDUX_HTML = `
+const API_FALLBACK_HTML = `
   <!doctype html>
   <html>
     <head>
-      <script id="redux-store-state">
-        {
-          "addons": {
-            "byID": {
-              "addon-1": {
-                "name": "Redux Add-on",
-                "description": "Redux description",
-                "ratings": { "average": "4.8", "count": "1,234" },
-                "average_daily_users": "12,345",
-                "currentVersionId": "version-1",
-                "url": "https://addons.mozilla.org/firefox/addon/redux-addon/",
-                "previews": [{ "src": "https://example.com/redux.png" }]
-              }
-            }
-          },
-          "versions": {
-            "byId": {
-              "version-1": {
-                "version": "v1.2.3",
-                "file": {
-                  "size": 1048576,
-                  "created": "2024-01-01"
-                }
-              }
-            }
-          }
-        }
-      </script>
       <script type="application/ld+json">
         {
           "offers": { "price": "0", "priceCurrency": "USD" },
@@ -166,17 +137,17 @@ describe("Amo", () => {
     const options = { headers: { "User-Agent": "Test" } };
     fetchTextMock
       .mockResolvedValueOnce(JSON.stringify(API_DATA))
-      .mockResolvedValueOnce(REDUX_HTML);
+      .mockResolvedValueOnce(API_FALLBACK_HTML);
 
-    const amo = new Amo({ id: "redux-addon", options });
+    const amo = new Amo({ id: "api-addon", options });
     await amo.load();
 
     expect(fetchTextMock).toHaveBeenCalledWith(
-      "https://addons.mozilla.org/api/v5/addons/addon/redux-addon/",
+      "https://addons.mozilla.org/api/v5/addons/addon/api-addon/",
       options,
     );
     expect(fetchTextMock).toHaveBeenCalledWith(
-      "https://addons.mozilla.org/firefox/addon/redux-addon",
+      "https://addons.mozilla.org/firefox/addon/api-addon",
       options,
     );
     expect(amo.meta()).toMatchObject({
@@ -198,7 +169,6 @@ describe("Amo", () => {
     expect(amo.sourceDOM).toBe(amo.sourceDOM);
     expect(amo.sourceJSONLD).toBe(amo.sourceJSONLD);
     expect(amo.sourceOG).toBe(amo.sourceOG);
-    expect(amo.sourceReduxStoreState).toBe(amo.sourceReduxStoreState);
   });
 
   it("also loads with static shortcut, locale, and querystring", async () => {
@@ -423,58 +393,6 @@ describe("AMO sources", () => {
     expect(source.description()).toBeNull();
     expect(source.url()).toBeNull();
     expect(source.image()).toBeNull();
-  });
-
-  it("handles incomplete Redux state", () => {
-    const noScript = new SourceReduxStoreState(parseDOM(""));
-    const noAddons = new SourceReduxStoreState(
-      parseDOM('<script id="redux-store-state">{"addons":{}}</script>'),
-    );
-    const noVersionId = new SourceReduxStoreState(
-      parseDOM(`
-        <script id="redux-store-state">
-          {
-            "addons": {
-              "byID": {
-                "addon": {
-                  "currentVersionId": {},
-                  "ratings": { "average": 6, "count": "bad" },
-                  "previews": [{}]
-                }
-              }
-            }
-          }
-        </script>
-      `),
-    );
-    const zeroSize = new SourceReduxStoreState(
-      parseDOM(`
-        <script id="redux-store-state">
-          {
-            "addons": {
-              "byID": {
-                "addon": { "currentVersionId": 1 }
-              }
-            },
-            "versions": {
-              "byId": {
-                "1": { "version": "v1.0.0", "file": { "size": 0 } }
-              }
-            }
-          }
-        </script>
-      `),
-    );
-
-    expect(noScript.name()).toBeNull();
-    expect(noAddons.name()).toBeNull();
-    expect(noVersionId.ratingValue()).toBeNull();
-    expect(noVersionId.ratingCount()).toBeNull();
-    expect(noVersionId.image()).toBeNull();
-    expect(noVersionId.size()).toBeNull();
-    expect(noVersionId.lastUpdated()).toBeNull();
-    expect(zeroSize.version()).toBe("1.0.0");
-    expect(zeroSize.size()).toBeNull();
   });
 
   it("parses AMO rating values in the accepted range", () => {

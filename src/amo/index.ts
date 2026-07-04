@@ -7,7 +7,6 @@ import { type AmoApiData, SourceAPI } from "./SourceAPI";
 import { SourceDOM } from "./SourceDOM";
 import { SourceJSONLD } from "./SourceJSONLD";
 import { SourceOG } from "./SourceOG";
-import { SourceReduxStoreState } from "./SourceReduxStoreState";
 
 export interface AmoOptions {
   /**
@@ -110,7 +109,6 @@ export class Amo {
   public name(): string | null {
     return (
       this.sourceAPI.name() ||
-      this.sourceReduxStoreState.name() ||
       this.sourceJSONLD.name() ||
       this.sourceDOM.name()
     );
@@ -119,7 +117,6 @@ export class Amo {
   public description(): string | null {
     return (
       this.sourceAPI.description() ||
-      this.sourceReduxStoreState.description() ||
       this.sourceJSONLD.description() ||
       this.sourceOG.description() ||
       this.sourceDOM.description()
@@ -129,7 +126,6 @@ export class Amo {
   public ratingValue(): number | null {
     return (
       this.sourceAPI.ratingValue() ??
-      this.sourceReduxStoreState.ratingValue() ??
       this.sourceJSONLD.ratingValue() ??
       this.sourceDOM.ratingValue()
     );
@@ -138,18 +134,13 @@ export class Amo {
   public ratingCount(): number | null {
     return (
       this.sourceAPI.ratingCount() ??
-      this.sourceReduxStoreState.ratingCount() ??
       this.sourceJSONLD.ratingCount() ??
       this.sourceDOM.ratingCount()
     );
   }
 
   public users(): number | null {
-    return (
-      this.sourceAPI.users() ??
-      this.sourceReduxStoreState.users() ??
-      this.sourceDOM.users()
-    );
+    return this.sourceAPI.users() ?? this.sourceDOM.users();
   }
 
   public price(): number | null {
@@ -163,7 +154,6 @@ export class Amo {
   public version(): string | null {
     return (
       this.sourceAPI.version() ||
-      this.sourceReduxStoreState.version() ||
       this.sourceJSONLD.version() ||
       this.sourceDOM.version()
     );
@@ -172,7 +162,6 @@ export class Amo {
   public url(): string | null {
     return (
       this.sourceAPI.url() ||
-      this.sourceReduxStoreState.url() ||
       this.sourceJSONLD.url() ||
       this.sourceOG.url() ||
       this.sourceDOM.url()
@@ -182,7 +171,6 @@ export class Amo {
   public image(): string | null {
     return (
       this.sourceAPI.image() ||
-      this.sourceReduxStoreState.image() ||
       this.sourceJSONLD.image() ||
       this.sourceOG.image() ||
       this.sourceDOM.image()
@@ -194,19 +182,11 @@ export class Amo {
   }
 
   public size(): string | null {
-    return (
-      this.sourceAPI.size() ||
-      this.sourceReduxStoreState.size() ||
-      this.sourceDOM.size()
-    );
+    return this.sourceAPI.size() || this.sourceDOM.size();
   }
 
   public lastUpdated(): string | null {
-    return (
-      this.sourceAPI.lastUpdated() ||
-      this.sourceReduxStoreState.lastUpdated() ||
-      this.sourceDOM.lastUpdated()
-    );
+    return this.sourceAPI.lastUpdated() || this.sourceDOM.lastUpdated();
   }
 
   private get apiUrl(): string {
@@ -277,16 +257,6 @@ export class Amo {
       this._sourceOG = new SourceOG(this.dom);
     }
     return this._sourceOG;
-  }
-
-  /** @internal */
-  private _sourceReduxStoreState?: SourceReduxStoreState;
-  /** @internal */
-  public get sourceReduxStoreState(): SourceReduxStoreState {
-    if (!this._sourceReduxStoreState) {
-      this._sourceReduxStoreState = new SourceReduxStoreState(this.dom);
-    }
-    return this._sourceReduxStoreState;
   }
 }
 

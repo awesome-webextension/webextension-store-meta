@@ -78,41 +78,6 @@ const sourceHealthChecks: Array<{
     ],
   },
   {
-    source: "Redux store state",
-    fields: [
-      ["name", (amo) => amo.sourceReduxStoreState.name(), expect.any(String)],
-      [
-        "description",
-        (amo) => amo.sourceReduxStoreState.description(),
-        expect.any(String),
-      ],
-      [
-        "ratingValue",
-        (amo) => amo.sourceReduxStoreState.ratingValue(),
-        expect.any(Number),
-      ],
-      [
-        "ratingCount",
-        (amo) => amo.sourceReduxStoreState.ratingCount(),
-        expect.any(Number),
-      ],
-      ["users", (amo) => amo.sourceReduxStoreState.users(), expect.any(Number)],
-      [
-        "version",
-        (amo) => amo.sourceReduxStoreState.version(),
-        expect.any(String),
-      ],
-      ["url", (amo) => amo.sourceReduxStoreState.url(), expect.any(String)],
-      ["image", (amo) => amo.sourceReduxStoreState.image(), expect.any(String)],
-      ["size", (amo) => amo.sourceReduxStoreState.size(), expect.any(String)],
-      [
-        "lastUpdated",
-        (amo) => amo.sourceReduxStoreState.lastUpdated(),
-        expect.any(String),
-      ],
-    ],
-  },
-  {
     source: "Open Graph",
     fields: [
       ["description", (amo) => amo.sourceOG.description(), expect.any(String)],
