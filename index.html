@@ -9,9 +9,11 @@
 </div>
 <p>Get browser extension(webextension) item meta from Chrome Web Store, Firefox add-ons, and Microsoft Edge Add-ons.</p>
 <p>This lib uses many fallback methods to improve stability and performance.
-The fallback sources are checked every day against the real Chrome Web Store,
-Firefox Add-ons, and Microsoft Edge Add-ons pages, so upstream store changes are
-caught quickly instead of silently breaking metadata extraction.</p>
+The data sources are checked every day against the live stores. Firefox Add-ons
+(AMO) uses only the v5 API; it does not fetch or parse add-on pages.
+AMO <code>price</code>, <code>priceCurrency</code>, and <code>operatingSystem</code> return <code>null</code> because these
+fields are not provided by this API source. API request failures reject <code>load()</code>.
+The AMO <code>dom</code>, <code>sourceDOM</code>, <code>sourceJSONLD</code>, and <code>sourceOG</code> accessors have been removed.</p>
 <h2 id="who-use-it" class="tsd-anchor-link">Who Use It<a href="#who-use-it" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <table>
   <tbody>
@@ -57,7 +59,8 @@ caught quickly instead of silently breaking metadata extraction.</p>
 <p>Load config:</p>
 <ul>
 <li><strong>id</strong> <code>{string}</code> <em>required</em> - extension id.</li>
-<li><strong>qs</strong> <code>{string|object}</code> <em>optional</em> - querystring.</li>
+<li><strong>qs</strong> <code>{string|object}</code> <em>optional</em> - querystring (ignored by AMO).</li>
+<li><strong>locale</strong> <code>{string}</code> <em>optional</em> - AMO API translation locale.</li>
 <li><strong>options</strong> <code>object</code> <em>optional</em> - <a href="https://undici.nodejs.org/#/?id=undicifetchinput-init-promise">undici.fetch options</a>.</li>
 </ul>
 <h2 id="development" class="tsd-anchor-link">Development<a href="#development" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
