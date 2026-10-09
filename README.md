@@ -14,9 +14,11 @@
 Get browser extension(webextension) item meta from Chrome Web Store, Firefox add-ons, and Microsoft Edge Add-ons.
 
 This lib uses many fallback methods to improve stability and performance.
-The fallback sources are checked every day against the real Chrome Web Store,
-Firefox Add-ons, and Microsoft Edge Add-ons pages, so upstream store changes are
-caught quickly instead of silently breaking metadata extraction.
+The data sources are checked every day against the live stores. Firefox Add-ons
+(AMO) uses only the v5 API; it does not fetch or parse add-on pages.
+AMO `price`, `priceCurrency`, and `operatingSystem` return `null` because these
+fields are not provided by this API source. API request failures reject `load()`.
+The AMO `dom`, `sourceDOM`, `sourceJSONLD`, and `sourceOG` accessors have been removed.
 
 ## Who Use It
 
@@ -91,7 +93,8 @@ console.log(amo.ratingValue())
 Load config:
 
 - **id** `{string}` _required_ - extension id.
-- **qs** `{string|object}` _optional_ - querystring.
+- **qs** `{string|object}` _optional_ - querystring (ignored by AMO).
+- **locale** `{string}` _optional_ - AMO API translation locale.
 - **options** `object` _optional_ - [undici.fetch options](https://undici.nodejs.org/#/?id=undicifetchinput-init-promise).
 
 ## Development

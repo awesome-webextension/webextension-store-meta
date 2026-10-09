@@ -1,21 +1,16 @@
 import { stringify } from "node:querystring";
-import { DomHandler, type Node } from "domhandler";
-import { Parser } from "htmlparser2/lib/Parser";
 import type { RequestInit } from "undici";
 import { fetchText } from "../utils/fetch-text";
 import { type AmoApiData, SourceAPI } from "./SourceAPI";
-import { SourceDOM } from "./SourceDOM";
-import { SourceJSONLD } from "./SourceJSONLD";
-import { SourceOG } from "./SourceOG";
 
 export interface AmoOptions {
   /**
-   * Chrome Web Store extension ID
-   * @example "cdonnmffkdaoajfknoeeecmchibpmkmg"
+   * Firefox Add-ons extension ID
+   * @example "ext-saladict"
    */
   id: string;
   /**
-   * Locale on the extension url
+   * Locale for API translations
    */
   locale?: string;
   /**
@@ -24,7 +19,7 @@ export interface AmoOptions {
    */
   options?: RequestInit;
   /**
-   * Query string
+   * @deprecated AMO uses the API only. Page query strings are ignored.
    */
   qs?: Record<string, string> | string;
 }
@@ -59,31 +54,10 @@ export class Amo {
   }
 
   public async load(): Promise<Amo> {
-    try {
-      this._apiData = JSON.parse(
-        await fetchText(this.apiUrl, this.config.options),
-      );
-    } catch (_) {
-      this._apiData = {};
-    }
-
-    let qs = this.config.qs
-      ? typeof this.config.qs === "string"
-        ? this.config.qs
-        : stringify(this.config.qs)
-      : "";
-    if (qs && !qs.startsWith("?")) {
-      qs = `?${qs}`;
-    }
-
-    const locale = this.config.locale ? `${this.config.locale}/` : "";
-
-    const url = `https://addons.mozilla.org/${locale}firefox/addon/${this.config.id}${qs}`;
-    const html = await fetchText(url, this.config.options);
-
-    const handler = new DomHandler();
-    new Parser(handler).end(html);
-    this._dom = handler.dom;
+    this._apiData = JSON.parse(
+      await fetchText(this.apiUrl, this.config.options),
+    );
+    this._sourceAPI = undefined;
 
     return this;
   }
@@ -107,86 +81,58 @@ export class Amo {
   }
 
   public name(): string | null {
-    return (
-      this.sourceAPI.name() ||
-      this.sourceJSONLD.name() ||
-      this.sourceDOM.name()
-    );
+    return this.sourceAPI.name();
   }
 
   public description(): string | null {
-    return (
-      this.sourceAPI.description() ||
-      this.sourceJSONLD.description() ||
-      this.sourceOG.description() ||
-      this.sourceDOM.description()
-    );
+    return this.sourceAPI.description();
   }
 
   public ratingValue(): number | null {
-    return (
-      this.sourceAPI.ratingValue() ??
-      this.sourceJSONLD.ratingValue() ??
-      this.sourceDOM.ratingValue()
-    );
+    return this.sourceAPI.ratingValue();
   }
 
   public ratingCount(): number | null {
-    return (
-      this.sourceAPI.ratingCount() ??
-      this.sourceJSONLD.ratingCount() ??
-      this.sourceDOM.ratingCount()
-    );
+    return this.sourceAPI.ratingCount();
   }
 
   public users(): number | null {
-    return this.sourceAPI.users() ?? this.sourceDOM.users();
+    return this.sourceAPI.users();
   }
 
+  /** Not provided by the AMO API. */
   public price(): number | null {
-    return this.sourceJSONLD.price();
+    return null;
   }
 
+  /** Not provided by the AMO API. */
   public priceCurrency(): string | null {
-    return this.sourceJSONLD.priceCurrency();
+    return null;
   }
 
   public version(): string | null {
-    return (
-      this.sourceAPI.version() ||
-      this.sourceJSONLD.version() ||
-      this.sourceDOM.version()
-    );
+    return this.sourceAPI.version();
   }
 
   public url(): string | null {
-    return (
-      this.sourceAPI.url() ||
-      this.sourceJSONLD.url() ||
-      this.sourceOG.url() ||
-      this.sourceDOM.url()
-    );
+    return this.sourceAPI.url();
   }
 
   public image(): string | null {
-    return (
-      this.sourceAPI.image() ||
-      this.sourceJSONLD.image() ||
-      this.sourceOG.image() ||
-      this.sourceDOM.image()
-    );
+    return this.sourceAPI.image();
   }
 
+  /** Not provided by the AMO API. */
   public operatingSystem(): string | null {
-    return this.sourceJSONLD.operatingSystem();
+    return null;
   }
 
   public size(): string | null {
-    return this.sourceAPI.size() || this.sourceDOM.size();
+    return this.sourceAPI.size();
   }
 
   public lastUpdated(): string | null {
-    return this.sourceAPI.lastUpdated() || this.sourceDOM.lastUpdated();
+    return this.sourceAPI.lastUpdated();
   }
 
   private get apiUrl(): string {
@@ -215,48 +161,6 @@ export class Amo {
       this._sourceAPI = new SourceAPI(this._apiData, this.config.locale);
     }
     return this._sourceAPI;
-  }
-
-  /** @internal */
-  private _dom?: Node[];
-
-  public get dom() {
-    if (!this._dom) {
-      throw new Error(
-        "Item not loaded. Please run `await instance.load()` first.`",
-      );
-    }
-    return this._dom;
-  }
-
-  /** @internal */
-  private _sourceDOM?: SourceDOM;
-  /** @internal */
-  public get sourceDOM(): SourceDOM {
-    if (!this._sourceDOM) {
-      this._sourceDOM = new SourceDOM(this.dom);
-    }
-    return this._sourceDOM;
-  }
-
-  /** @internal */
-  private _sourceJSONLD?: SourceJSONLD;
-  /** @internal */
-  public get sourceJSONLD(): SourceJSONLD {
-    if (!this._sourceJSONLD) {
-      this._sourceJSONLD = new SourceJSONLD(this.dom);
-    }
-    return this._sourceJSONLD;
-  }
-
-  /** @internal */
-  private _sourceOG?: SourceOG;
-  /** @internal */
-  public get sourceOG(): SourceOG {
-    if (!this._sourceOG) {
-      this._sourceOG = new SourceOG(this.dom);
-    }
-    return this._sourceOG;
   }
 }
 
