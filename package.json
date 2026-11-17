@@ -47,7 +47,7 @@
   },
   "homepage": "https://github.com/awesome-webextension/webextension-store-meta#readme",
   "engines": {
-    "node": ">=18"
+    "node": ">=24"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.4",

@@ -7,16 +7,13 @@ jobs:
   store-health:
     name: Store health
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18, 20]
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies 📦
@@ -26,5 +23,4 @@ jobs:
         run: npm run test
 
       - name: Source health 🩺
-        if: ${{ matrix.node-version == 20 && !cancelled() }}
         run: npm run test:daily
