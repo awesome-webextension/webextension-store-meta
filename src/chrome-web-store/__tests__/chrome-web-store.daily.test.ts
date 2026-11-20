@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ChromeWebStore } from "../";
+import { parseMetricsFromDOM } from "../parse-metrics";
 import { fixtures } from "./fixtures";
 
 describe("Chrome Web Store health", async () => {
@@ -16,22 +17,27 @@ describe("Chrome Web Store health", async () => {
     lastUpdated: expect.any(String),
   };
 
-  describe.each(await fixtures())(
-    "%s",
-    (id) => {
-      it("should return ext info", async () => {
-        const chromeWebStore = await ChromeWebStore.load({ id });
-        expect(chromeWebStore.meta()).toMatchObject(matchAnyInfo);
-      });
+  describe.each(await fixtures())("%s", (id) => {
+    it.each([
+      ["default", undefined],
+      ["Chinese", { hl: "zh", lr: "lang_zh-CN" }],
+    ] as const)(
+      "reads metadata with the %s locale",
+      async (_, qs) => {
+        const item = await ChromeWebStore.load({ id, qs });
 
-      it("should concat querystring", async () => {
-        const chromeWebStore = await ChromeWebStore.load({
-          id,
-          qs: { hl: "zh", lr: "lang_zh-CN" },
-        });
-        expect(chromeWebStore.meta()).toMatchObject(matchAnyInfo);
-      });
-    },
-    20000,
-  );
+        expect({
+          ...parseMetricsFromDOM(item.dom, id),
+          name: item.name(),
+          description: item.description(),
+          version: item.version(),
+          url: item.url(),
+          image: item.image(),
+          size: item.size(),
+          lastUpdated: item.lastUpdated(),
+        }).toMatchObject(matchAnyInfo);
+      },
+      20000,
+    );
+  });
 });

@@ -26,6 +26,14 @@ const parseDOM = (html: string) => {
 
 const DETAIL_URL = "https://chromewebstore.google.com/detail/name/extension-id";
 
+function pageData(id: string, ratingCount: number, users: number): string {
+  const detail = new Array(15).fill(null);
+  detail[0] = id;
+  detail[4] = ratingCount;
+  detail[14] = users;
+  return `<script>AF_initDataCallback({key: 'ds:0', hash: '2', data: ${JSON.stringify([detail])}, sideChannel: {}});</script>`;
+}
+
 describe("Chrome Web Store", () => {
   beforeEach(() => {
     fetchTextMock.mockReset();
@@ -71,6 +79,103 @@ describe("Chrome Web Store", () => {
     });
     expect(chromeWebStore.users()).toBe(12345);
     expect(chromeWebStore.version()).toBe("1.2.3");
+  });
+
+  it.each([
+    ["en", "14.6K ratings", 14600],
+    ["zh-CN", "1.5万 个评分", 15000],
+  ])(
+    "parses abbreviated legacy counts in %s",
+    async (language, text, count) => {
+      fetchTextMock.mockResolvedValueOnce(`
+      <html lang="${language}">
+        <head><link rel="canonical" href="${DETAIL_URL}"></head>
+        <body>
+          <div class="j3zrsd"><p class="xJEoWe">${text}</p></div>
+          ${pageData("extension-id", 14631, 2000000)}
+        </body>
+      </html>
+    `);
+
+      const item = await ChromeWebStore.load({ id: "extension-id" });
+
+      expect(item.ratingCount()).toBe(count);
+      expect(item.users()).toBe(2000000);
+    },
+  );
+
+  it("reads the localized rating and users from the new layout", async () => {
+    fetchTextMock.mockResolvedValueOnce(`
+      <html lang="de">
+        <head><link rel="canonical" href="${DETAIL_URL}"></head>
+        <body>
+          <div class="j3zrsd">
+            <div class="NipEU">
+              <div class="x5MnV">
+                <span class="MH16jb"><span class="Vq0ZA">3,8</span></span>
+                <a href="./detail/name/extension-id/reviews" class="OPaHCf">14.631&nbsp;Bewertungen</a>
+              </div>
+              <div class="x5MnV"><span class="MH16jb">2&nbsp;Mio.</span><span class="OPaHCf">Nutzer</span></div>
+              <div class="x5MnV"><span class="MH16jb">2026</span><span class="OPaHCf">letzte Aktualisierung</span></div>
+            </div>
+          </div>
+          ${pageData("extension-id", 14630, 2100000)}
+        </body>
+      </html>
+    `);
+
+    const item = await ChromeWebStore.load({ id: "extension-id" });
+
+    expect(item.meta()).toMatchObject({
+      ratingValue: 3.8,
+      ratingCount: 14631,
+      users: 2000000,
+    });
+  });
+
+  it("falls back for missing new-layout counts and keeps a zero from the DOM", async () => {
+    fetchTextMock.mockResolvedValueOnce(`
+      <html lang="en">
+        <head><link rel="canonical" href="${DETAIL_URL}"></head>
+        <body>
+          <div class="j3zrsd">
+            <div class="NipEU">
+              <div class="x5MnV"><a href="./detail/name/extension-id/reviews" class="OPaHCf">0 ratings</a></div>
+              <div class="x5MnV"><span class="MH16jb">2026</span><span class="OPaHCf">Last updated</span></div>
+            </div>
+          </div>
+          ${pageData("extension-id", 50, 800)}
+        </body>
+      </html>
+    `);
+
+    const item = await ChromeWebStore.load({ id: "extension-id" });
+
+    expect(item.ratingCount()).toBe(0);
+    expect(item.users()).toBe(800);
+  });
+
+  it("falls back for a missing legacy rating count while keeping users from the DOM", async () => {
+    fetchTextMock.mockResolvedValueOnce(`
+      <link rel="canonical" href="${DETAIL_URL}">
+      <div class="F9iKBc">900 users</div>
+      ${pageData("extension-id", 50, 800)}
+    `);
+
+    const item = await ChromeWebStore.load({ id: "extension-id" });
+
+    expect(item.meta()).toMatchObject({ ratingCount: 50, users: 900 });
+  });
+
+  it("does not use embedded counts for another extension", async () => {
+    fetchTextMock.mockResolvedValueOnce(`
+      <link rel="canonical" href="${DETAIL_URL}">
+      ${pageData("related-extension", 123, 450)}
+    `);
+
+    const item = await ChromeWebStore.load({ id: "extension-id" });
+
+    expect(item.meta()).toMatchObject({ ratingCount: null, users: null });
   });
 
   it("concat querystring from objects and strings", async () => {

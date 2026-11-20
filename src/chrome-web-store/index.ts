@@ -1,10 +1,15 @@
 import { parse, stringify } from "node:querystring";
-import { DomHandler, isTag, isText, type Node } from "domhandler";
+import { DomHandler, isTag, type Node } from "domhandler";
 import { Parser } from "htmlparser2/lib/Parser";
 import type { RequestInit } from "undici";
 import { findOne, getText, queryOne } from "../utils/dom";
 import { fetchText } from "../utils/fetch-text";
-import { parseNum, parseVersion } from "../utils/parse";
+import { parseVersion } from "../utils/parse";
+import {
+  type ChromeWebStoreMetrics,
+  parseCountsFromPageData,
+  parseMetricsFromDOM,
+} from "./parse-metrics";
 
 export type { RequestInit };
 
@@ -45,6 +50,7 @@ export class ChromeWebStore {
 
   private _dom: Node[] | null = null;
   private _cache = new Map<string, string | null>();
+  private _metrics: ChromeWebStoreMetrics | null = null;
 
   public constructor({ id, options, qs }: ChromeWebStoreOptions) {
     this.id = id;
@@ -74,6 +80,8 @@ export class ChromeWebStore {
 
     // Only keep DOM if it's an item page
     this._dom = href?.includes("/detail/") ? handler.dom : [];
+    this._cache.clear();
+    this._metrics = null;
 
     return this;
   }
@@ -125,35 +133,15 @@ export class ChromeWebStore {
   }
 
   public ratingValue(): number | null {
-    return this._parseRating("ratingValue");
+    return this.metrics.ratingValue;
   }
 
   public ratingCount(): number | null {
-    return this._parseRating("ratingCount");
+    return this.metrics.ratingCount;
   }
 
   public users(): number | null {
-    if (!this._cache.has("users")) {
-      const container = queryOne(this.dom, "F9iKBc");
-      if (container) {
-        for (let i = 0; i < container.children.length; i++) {
-          const node = container.children[i];
-          if (isText(node)) {
-            const content = getText(node);
-            const match = /[\d,]+/.exec(content);
-            if (match) {
-              this._cache.set("users", match[0]);
-              break;
-            }
-          }
-        }
-      }
-      if (!this._cache.has("users")) {
-        this._cache.set("users", null);
-      }
-    }
-
-    return parseNum(this._cache.get("users"));
+    return this.metrics.users;
   }
 
   public version(): string | null {
@@ -211,48 +199,28 @@ export class ChromeWebStore {
     return this._cache.get(property) ?? null;
   }
 
-  private _parseRating(key: "ratingValue" | "ratingCount"): number | null {
-    if (!this._cache.has(key)) {
-      const result = parseRating(this.dom);
-      this._cache.set("ratingValue", result?.ratingValue ?? null);
-      this._cache.set("ratingCount", result?.ratingCount ?? null);
+  private get metrics(): ChromeWebStoreMetrics {
+    if (!this._metrics) {
+      const { ratingValue, ratingCount, users } = parseMetricsFromDOM(
+        this.dom,
+        this.id,
+      );
+      const fallback =
+        ratingCount === null || users === null
+          ? parseCountsFromPageData(this.dom, this.id)
+          : null;
+      this._metrics = {
+        ratingValue,
+        ratingCount: ratingCount ?? fallback?.ratingCount ?? null,
+        users: users ?? fallback?.users ?? null,
+      };
     }
 
-    return parseNum(this._cache.get(key));
+    return this._metrics;
   }
 }
 
 export default ChromeWebStore;
-
-function parseRating(
-  dom: Node | Node[],
-): { ratingValue: string | null; ratingCount: string | null } | null {
-  const container = queryOne(dom, "j3zrsd");
-  if (container) {
-    const result = {
-      ratingValue: null as string | null,
-      ratingCount: null as string | null,
-    };
-
-    const ratingValueEl = queryOne(container, "Vq0ZA");
-    if (ratingValueEl) {
-      const ratingValue = getText(ratingValueEl);
-      if (/^\d+\.?\d*$/.test(ratingValue)) {
-        result.ratingValue = ratingValue;
-      }
-    }
-
-    const ratingCountEl = queryOne(container, "xJEoWe");
-    if (ratingCountEl) {
-      result.ratingCount = getText(ratingCountEl).replace(/\s*ratings$/, "");
-    }
-
-    if (result.ratingValue !== null || result.ratingCount !== null) {
-      return result;
-    }
-  }
-  return null;
-}
 
 function parseVersionFromManifest(nodes: Node[]): string | null {
   for (let i = 0; i < nodes.length; i++) {
